@@ -6,4 +6,3 @@
 #include "linker/linker_kernel_1.h"
 
 #endif // DLIB_LINKEr_
-

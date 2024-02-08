@@ -7,31 +7,20 @@
 
 #include "algs.h"
 
-namespace dlib
-{
+namespace dlib {
 
-    template <
-        typename T,
-        typename E = char,
-        typename mem_manager = default_memory_manager 
-        >
-    class graph 
-    {
-        graph() {}
-    public:
-                
+template <typename T, typename E = char,
+          typename mem_manager = default_memory_manager>
+class graph {
+  graph() {}
 
-        //----------- kernels ---------------
+public:
+  //----------- kernels ---------------
 
-        // kernel_1a        
-        typedef     graph_kernel_1<T,E,mem_manager,false>    
-                    kernel_1a;
-        typedef     graph_kernel_1<T,E,mem_manager,true>    
-                    kernel_1a_c;
- 
-    };
-}
+  // kernel_1a
+  typedef graph_kernel_1<T, E, mem_manager, false> kernel_1a;
+  typedef graph_kernel_1<T, E, mem_manager, true> kernel_1a_c;
+};
+} // namespace dlib
 
-#endif // DLIB_GRAPh_ 
-
-
+#endif // DLIB_GRAPh_

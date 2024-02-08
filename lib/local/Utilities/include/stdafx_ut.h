@@ -4,8 +4,9 @@
 //
 // ACADEMIC OR NON-PROFIT ORGANIZATION NONCOMMERCIAL RESEARCH USE ONLY
 //
-// BY USING OR DOWNLOADING THE SOFTWARE, YOU ARE AGREEING TO THE TERMS OF THIS LICENSE AGREEMENT.  
-// IF YOU DO NOT AGREE WITH THESE TERMS, YOU MAY NOT USE OR DOWNLOAD THE SOFTWARE.
+// BY USING OR DOWNLOADING THE SOFTWARE, YOU ARE AGREEING TO THE TERMS OF THIS
+// LICENSE AGREEMENT. IF YOU DO NOT AGREE WITH THESE TERMS, YOU MAY NOT USE OR
+// DOWNLOAD THE SOFTWARE.
 //
 // License can be found in OpenFace-license.txt
 //
@@ -21,22 +22,22 @@
 #include <opencv2/imgproc.hpp>
 
 // For FHOG visualisation
-#include <dlib/opencv.h>
 #include <dlib/image_processing/frontal_face_detector.h>
+#include <dlib/opencv.h>
 
 // C++ standard stuff
 #include <stdio.h>
 
 #include <fstream>
-#include <iostream>
-#include <sstream>
-#include <locale>
 #include <iomanip>
+#include <iostream>
+#include <locale>
+#include <sstream>
 
-#include <vector>
-#include <queue>
 #include <map>
+#include <queue>
 #include <set>
+#include <vector>
 
 // For sorting
 #include <algorithm>
@@ -46,7 +47,8 @@
 #include <ctime>
 
 // Filesystem stuff
-// It can either be in std filesystem (C++17), or in experimental/filesystem (partial C++17 support) or in boost
+// It can either be in std filesystem (C++17), or in experimental/filesystem
+// (partial C++17 support) or in boost
 #if __has_include(<boost/filesystem.hpp>)
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>

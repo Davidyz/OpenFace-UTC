@@ -7,4 +7,3 @@
 #include "timer/timer_heavy.h"
 
 #endif // DLIB_TIMEr_
-

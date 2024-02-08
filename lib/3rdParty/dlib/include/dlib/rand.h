@@ -6,4 +6,3 @@
 #include "rand/rand_kernel_1.h"
 
 #endif // DLIB_RANd_
-

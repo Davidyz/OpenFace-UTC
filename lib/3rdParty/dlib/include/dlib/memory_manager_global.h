@@ -3,36 +3,20 @@
 #ifndef DLIB_MEMORY_MANAGER_GLOBAl_
 #define DLIB_MEMORY_MANAGER_GLOBAl_
 
-#include "memory_manager_global/memory_manager_global_kernel_1.h"
 #include "memory_manager.h"
+#include "memory_manager_global/memory_manager_global_kernel_1.h"
 
+namespace dlib {
 
+template <typename T, typename factory> class memory_manager_global {
+  memory_manager_global() {}
 
-namespace dlib
-{
+public:
+  //----------- kernels ---------------
 
-    template <
-        typename T,
-        typename factory
-        >
-    class memory_manager_global
-    {
-        memory_manager_global() {}
-
-
-    public:
-        
-        //----------- kernels ---------------
-
-        // kernel_1        
-        typedef      memory_manager_global_kernel_1<T,factory>
-                     kernel_1a;
-      
-      
-           
-
-    };
-}
+  // kernel_1
+  typedef memory_manager_global_kernel_1<T, factory> kernel_1a;
+};
+} // namespace dlib
 
 #endif // DLIB_MEMORY_MANAGER_GLOBAl_
-

@@ -5,27 +5,17 @@
 
 #include "sync_extension/sync_extension_kernel_1.h"
 
+namespace dlib {
 
+template <typename base> class sync_extension {
+  sync_extension() {}
 
-namespace dlib
-{
+public:
+  //----------- kernels ---------------
 
-    template <
-        typename base
-        >
-    class sync_extension
-    {
-        sync_extension() {}
-    public:
-        
-        //----------- kernels ---------------
-
-        // kernel_1a        
-        typedef     sync_extension_kernel_1<base>    
-                    kernel_1a;
- 
-    };
-}
+  // kernel_1a
+  typedef sync_extension_kernel_1<base> kernel_1a;
+};
+} // namespace dlib
 
 #endif // DLIB_SYNC_EXTENSIOn_
-

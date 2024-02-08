@@ -3,77 +3,65 @@
 #ifndef DLIB_LAPACk_ES_Hh_
 #define DLIB_LAPACk_ES_Hh_
 
-#include "fortran_id.h"
 #include "../matrix.h"
+#include "fortran_id.h"
 
-namespace dlib
-{
-    namespace lapack
-    {
-        namespace binding
-        {
-#if defined(__alpha__) || defined(__sparc64__) || defined(__x86_64__) || defined(__ia64__)
-            typedef int logical;
+namespace dlib {
+namespace lapack {
+namespace binding {
+#if defined(__alpha__) || defined(__sparc64__) || defined(__x86_64__) ||       \
+    defined(__ia64__)
+typedef int logical;
 #else
-            typedef long int logical;
+typedef long int logical;
 #endif
-            typedef logical (*L_fp)(...);
+typedef logical (*L_fp)(...);
 
-            extern "C"
-            {
-                void DLIB_FORTRAN_ID(dgees) (char *jobvs, char *sort, L_fp select, integer *n, 
-                                             double *a, integer *lda, integer *sdim, double *wr, 
-                                             double *wi, double *vs, integer *ldvs, double *work, 
-                                             integer *lwork, logical *bwork, integer *info);
+extern "C" {
+void DLIB_FORTRAN_ID(dgees)(char *jobvs, char *sort, L_fp select, integer *n,
+                            double *a, integer *lda, integer *sdim, double *wr,
+                            double *wi, double *vs, integer *ldvs, double *work,
+                            integer *lwork, logical *bwork, integer *info);
 
-                void DLIB_FORTRAN_ID(sgees) (char *jobvs, char *sort, L_fp select, integer *n, 
-                                             float *a, integer *lda, integer *sdim, float *wr, 
-                                             float *wi, float *vs, integer *ldvs, float *work, 
-                                             integer *lwork, logical *bwork, integer *info);
+void DLIB_FORTRAN_ID(sgees)(char *jobvs, char *sort, L_fp select, integer *n,
+                            float *a, integer *lda, integer *sdim, float *wr,
+                            float *wi, float *vs, integer *ldvs, float *work,
+                            integer *lwork, logical *bwork, integer *info);
+}
 
-            }
+inline int gees(char jobvs, integer n, double *a, integer lda, double *wr,
+                double *wi, double *vs, integer ldvs, double *work,
+                integer lwork) {
+  // No sorting allowed
+  integer info = 0;
+  char sort = 'N';
+  L_fp fnil = 0;
+  logical bwork = 0;
+  integer sdim = 0;
+  DLIB_FORTRAN_ID(dgees)
+  (&jobvs, &sort, fnil, &n, a, &lda, &sdim, wr, wi, vs, &ldvs, work, &lwork,
+   &bwork, &info);
+  return info;
+}
 
-            inline int gees (char jobvs, integer n, 
-                             double *a, integer lda, double *wr, 
-                             double *wi, double *vs, integer ldvs, double *work, 
-                             integer lwork)
-            {
-                // No sorting allowed
-                integer info = 0;
-                char sort = 'N';
-                L_fp fnil = 0;
-                logical bwork = 0;
-                integer sdim = 0;
-                DLIB_FORTRAN_ID(dgees)(&jobvs, &sort, fnil, &n,
-                                       a, &lda, &sdim, wr,
-                                       wi, vs, &ldvs, work,
-                                       &lwork, &bwork, &info);
-                return info;
-            }
+inline int gees(char jobvs, integer n, float *a, integer lda, float *wr,
+                float *wi, float *vs, integer ldvs, float *work,
+                integer lwork) {
+  // No sorting allowed
+  integer info = 0;
+  char sort = 'N';
+  L_fp fnil = 0;
+  logical bwork = 0;
+  integer sdim = 0;
+  DLIB_FORTRAN_ID(sgees)
+  (&jobvs, &sort, fnil, &n, a, &lda, &sdim, wr, wi, vs, &ldvs, work, &lwork,
+   &bwork, &info);
+  return info;
+}
 
+} // namespace binding
 
-            inline int gees (char jobvs, integer n, 
-                             float *a, integer lda, float *wr, 
-                             float *wi, float *vs, integer ldvs, float *work, 
-                             integer lwork)
-            {
-                // No sorting allowed
-                integer info = 0;
-                char sort = 'N';
-                L_fp fnil = 0;
-                logical bwork = 0;
-                integer sdim = 0;
-                DLIB_FORTRAN_ID(sgees)(&jobvs, &sort, fnil, &n,
-                                       a, &lda, &sdim, wr,
-                                       wi, vs, &ldvs, work,
-                                       &lwork, &bwork, &info);
-                return info;
-            }
-
-
-        }
-
-    // ------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------
 
 /*  -- LAPACK driver routine (version 3.1) -- */
 /*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
@@ -119,7 +107,8 @@ namespace dlib
 /*          = 'N': Eigenvalues are not ordered; */
 /*          = 'S': Eigenvalues are ordered (see SELECT). */
 
-/*  SELECT  (external procedure) LOGICAL FUNCTION of two DOUBLE PRECISION arguments */
+/*  SELECT  (external procedure) LOGICAL FUNCTION of two DOUBLE PRECISION
+ * arguments */
 /*          SELECT must be declared EXTERNAL in the calling subroutine. */
 /*          If SORT = 'S', SELECT is used to select eigenvalues to sort */
 /*          to the top left of the Schur form. */
@@ -169,7 +158,8 @@ namespace dlib
 /*          The leading dimension of the array VS.  LDVS >= 1; if */
 /*          JOBVS = 'V', LDVS >= N. */
 
-/*  WORK    (workspace/output) DOUBLE PRECISION array, dimension (MAX(1,LWORK)) */
+/*  WORK    (workspace/output) DOUBLE PRECISION array, dimension (MAX(1,LWORK))
+ */
 /*          On exit, if INFO = 0, WORK(1) contains the optimal LWORK. */
 
 /*  LWORK   (input) INTEGER */
@@ -201,64 +191,50 @@ namespace dlib
 /*                   the Schur form no longer satisfy SELECT=.TRUE.  This */
 /*                   could also be caused by underflow due to scaling. */
 
-    // ------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------
 
-        template <
-            typename T, 
-            long NR1, long NR2, long NR3, long NR4,
-            long NC1, long NC2, long NC3, long NC4,
-            typename MM,
-            typename layout
-            >
-        int gees (
-            const char jobz,
-            matrix<T,NR1,NC1,MM,column_major_layout>& a,
-            matrix<T,NR2,NC2,MM,layout>& wr,
-            matrix<T,NR3,NC3,MM,layout>& wi,
-            matrix<T,NR4,NC4,MM,column_major_layout>& vs
-        )
-        {
-            matrix<T,0,1,MM,column_major_layout> work;
+template <typename T, long NR1, long NR2, long NR3, long NR4, long NC1,
+          long NC2, long NC3, long NC4, typename MM, typename layout>
+int gees(const char jobz, matrix<T, NR1, NC1, MM, column_major_layout> &a,
+         matrix<T, NR2, NC2, MM, layout> &wr,
+         matrix<T, NR3, NC3, MM, layout> &wi,
+         matrix<T, NR4, NC4, MM, column_major_layout> &vs) {
+  matrix<T, 0, 1, MM, column_major_layout> work;
 
-            const long n = a.nr();
+  const long n = a.nr();
 
-            wr.set_size(n,1);
-            wi.set_size(n,1);
+  wr.set_size(n, 1);
+  wi.set_size(n, 1);
 
-            if (jobz == 'V')
-                vs.set_size(n,n);
-            else
-                vs.set_size(NR4?NR4:1, NC4?NC4:1);
+  if (jobz == 'V')
+    vs.set_size(n, n);
+  else
+    vs.set_size(NR4 ? NR4 : 1, NC4 ? NC4 : 1);
 
-            // figure out how big the workspace needs to be.
-            T work_size = 1;
-            int info = binding::gees(jobz, n, 
-                                     &a(0,0), a.nr(), &wr(0,0), 
-                                     &wi(0,0), &vs(0,0), vs.nr(), &work_size, 
-                                     -1);
+  // figure out how big the workspace needs to be.
+  T work_size = 1;
+  int info = binding::gees(jobz, n, &a(0, 0), a.nr(), &wr(0, 0), &wi(0, 0),
+                           &vs(0, 0), vs.nr(), &work_size, -1);
 
-            if (info != 0)
-                return info;
+  if (info != 0)
+    return info;
 
-            if (work.size() < work_size)
-                work.set_size(static_cast<long>(work_size), 1);
+  if (work.size() < work_size)
+    work.set_size(static_cast<long>(work_size), 1);
 
-            // compute the actual decomposition 
-            info = binding::gees(jobz, n, 
-                                 &a(0,0), a.nr(), &wr(0,0), 
-                                 &wi(0,0), &vs(0,0), vs.nr(), &work(0,0), 
-                                 work.size());
+  // compute the actual decomposition
+  info = binding::gees(jobz, n, &a(0, 0), a.nr(), &wr(0, 0), &wi(0, 0),
+                       &vs(0, 0), vs.nr(), &work(0, 0), work.size());
 
-            return info;
-        }
-
-    // ------------------------------------------------------------------------------------
-
-    }
-
+  return info;
 }
+
+// ------------------------------------------------------------------------------------
+
+} // namespace lapack
+
+} // namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
 #endif // DLIB_LAPACk_ES_Hh_
-

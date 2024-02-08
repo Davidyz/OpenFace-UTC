@@ -3,42 +3,35 @@
 #ifndef DLIB_LAPACk_POTRF_Hh_
 #define DLIB_LAPACk_POTRF_Hh_
 
-#include "fortran_id.h"
 #include "../matrix.h"
+#include "fortran_id.h"
 
-namespace dlib
-{
-    namespace lapack
-    {
-        namespace binding
-        {
-            extern "C"
-            {
-                void DLIB_FORTRAN_ID(dpotrf) (char *uplo, integer *n, double *a, 
-                                              integer* lda, integer *info);
+namespace dlib {
+namespace lapack {
+namespace binding {
+extern "C" {
+void DLIB_FORTRAN_ID(dpotrf)(char *uplo, integer *n, double *a, integer *lda,
+                             integer *info);
 
-                void DLIB_FORTRAN_ID(spotrf) (char *uplo, integer *n, float *a, 
-                                              integer* lda, integer *info);
+void DLIB_FORTRAN_ID(spotrf)(char *uplo, integer *n, float *a, integer *lda,
+                             integer *info);
+}
 
-            }
+inline int potrf(char uplo, integer n, double *a, integer lda) {
+  integer info = 0;
+  DLIB_FORTRAN_ID(dpotrf)(&uplo, &n, a, &lda, &info);
+  return info;
+}
 
-            inline int potrf (char uplo, integer n, double *a, integer lda)
-            {
-                integer info = 0;
-                DLIB_FORTRAN_ID(dpotrf)(&uplo, &n, a, &lda, &info);
-                return info;
-            }
+inline int potrf(char uplo, integer n, float *a, integer lda) {
+  integer info = 0;
+  DLIB_FORTRAN_ID(spotrf)(&uplo, &n, a, &lda, &info);
+  return info;
+}
 
-            inline int potrf (char uplo, integer n, float *a, integer lda)
-            {
-                integer info = 0;
-                DLIB_FORTRAN_ID(spotrf)(&uplo, &n, a, &lda, &info);
-                return info;
-            }
+} // namespace binding
 
-        }
-
-    // ------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------
 
 /*  -- LAPACK routine (version 3.1) -- */
 /*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
@@ -94,81 +87,58 @@ namespace dlib
 /*                positive definite, and the factorization could not be */
 /*                completed. */
 
+// ------------------------------------------------------------------------------------
 
-    // ------------------------------------------------------------------------------------
+template <typename T, long NR1, long NC1, typename MM>
+int potrf(char uplo, matrix<T, NR1, NC1, MM, column_major_layout> &a) {
+  // compute the actual decomposition
+  int info = binding::potrf(uplo, a.nr(), &a(0, 0), a.nr());
 
-        template <
-            typename T, 
-            long NR1,
-            long NC1, 
-            typename MM
-            >
-        int potrf (
-            char uplo,
-            matrix<T,NR1,NC1,MM,column_major_layout>& a
-        )
-        {
-            // compute the actual decomposition 
-            int info = binding::potrf(uplo, a.nr(), &a(0,0), a.nr());
+  // If it fails part way though the factorization then make sure
+  // the end of the matrix gets properly initialized with zeros.
+  if (info > 0) {
+    if (uplo == 'L')
+      set_colm(a, range(info - 1, a.nc() - 1)) = 0;
+    else
+      set_rowm(a, range(info - 1, a.nr() - 1)) = 0;
+  }
 
-            // If it fails part way though the factorization then make sure
-            // the end of the matrix gets properly initialized with zeros.
-            if (info > 0)
-            {
-                if (uplo == 'L')
-                    set_colm(a, range(info-1, a.nc()-1)) = 0;
-                else
-                    set_rowm(a, range(info-1, a.nr()-1)) = 0;
-            }
-
-            return info;
-        }
-
-    // ------------------------------------------------------------------------------------
-
-        template <
-            typename T, 
-            long NR1,
-            long NC1, 
-            typename MM
-            >
-        int potrf (
-            char uplo,
-            matrix<T,NR1,NC1,MM,row_major_layout>& a
-        )
-        {
-            // since we are working on a row major order matrix we need to ask
-            // LAPACK for the transpose of whatever the user asked for.
-
-            if (uplo == 'L')
-                uplo = 'U';
-            else
-                uplo = 'L';
-
-            // compute the actual decomposition 
-            int info = binding::potrf(uplo, a.nr(), &a(0,0), a.nr());
-
-            // If it fails part way though the factorization then make sure
-            // the end of the matrix gets properly initialized with zeros.
-            if (info > 0)
-            {
-                if (uplo == 'U')
-                    set_colm(a, range(info-1, a.nc()-1)) = 0;
-                else
-                    set_rowm(a, range(info-1, a.nr()-1)) = 0;
-            }
-
-            return info;
-        }
-
-    // ------------------------------------------------------------------------------------
-
-    }
-
+  return info;
 }
+
+// ------------------------------------------------------------------------------------
+
+template <typename T, long NR1, long NC1, typename MM>
+int potrf(char uplo, matrix<T, NR1, NC1, MM, row_major_layout> &a) {
+  // since we are working on a row major order matrix we need to ask
+  // LAPACK for the transpose of whatever the user asked for.
+
+  if (uplo == 'L')
+    uplo = 'U';
+  else
+    uplo = 'L';
+
+  // compute the actual decomposition
+  int info = binding::potrf(uplo, a.nr(), &a(0, 0), a.nr());
+
+  // If it fails part way though the factorization then make sure
+  // the end of the matrix gets properly initialized with zeros.
+  if (info > 0) {
+    if (uplo == 'U')
+      set_colm(a, range(info - 1, a.nc() - 1)) = 0;
+    else
+      set_rowm(a, range(info - 1, a.nr() - 1)) = 0;
+  }
+
+  return info;
+}
+
+// ------------------------------------------------------------------------------------
+
+} // namespace lapack
+
+} // namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
 #endif // DLIB_LAPACk_POTRF_Hh_
-
-

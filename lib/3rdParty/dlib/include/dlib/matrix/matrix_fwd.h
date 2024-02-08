@@ -5,27 +5,21 @@
 
 #include "../algs.h"
 
-namespace dlib
-{
+namespace dlib {
 
 // ----------------------------------------------------------------------------------------
 
-    struct row_major_layout;
+struct row_major_layout;
 
 // ----------------------------------------------------------------------------------------
 
-    template <
-        typename T,
-        long num_rows = 0,
-        long num_cols = 0,
-        typename mem_manager = default_memory_manager,
-        typename layout = row_major_layout 
-        >
-    class matrix; 
+template <typename T, long num_rows = 0, long num_cols = 0,
+          typename mem_manager = default_memory_manager,
+          typename layout = row_major_layout>
+class matrix;
 
 // ----------------------------------------------------------------------------------------
 
-}
+} // namespace dlib
 
 #endif // DLIB_MATRIx_FWD
-

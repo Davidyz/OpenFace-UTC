@@ -4,8 +4,9 @@
 //
 // ACADEMIC OR NON-PROFIT ORGANIZATION NONCOMMERCIAL RESEARCH USE ONLY
 //
-// BY USING OR DOWNLOADING THE SOFTWARE, YOU ARE AGREEING TO THE TERMS OF THIS LICENSE AGREEMENT.  
-// IF YOU DO NOT AGREE WITH THESE TERMS, YOU MAY NOT USE OR DOWNLOAD THE SOFTWARE.
+// BY USING OR DOWNLOADING THE SOFTWARE, YOU ARE AGREEING TO THE TERMS OF THIS
+// LICENSE AGREEMENT. IF YOU DO NOT AGREE WITH THESE TERMS, YOU MAY NOT USE OR
+// DOWNLOAD THE SOFTWARE.
 //
 // License can be found in OpenFace-license.txt
 //
@@ -16,12 +17,12 @@
 #define __STDAFX_FA_h_
 
 // OpenCV includes
+#include <opencv2/calib3d.hpp>
 #include <opencv2/core/core.hpp>
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/imgcodecs.hpp>
 #include <opencv2/imgproc.hpp>
 #include <opencv2/objdetect.hpp>
-#include <opencv2/calib3d.hpp>
-#include <opencv2/imgcodecs.hpp>
-#include <opencv2/highgui/highgui.hpp>
 
 // dlib dependencies for face detection
 #include <dlib/image_processing/frontal_face_detector.h>
@@ -34,14 +35,15 @@
 #include <iostream>
 #include <sstream>
 
-#include <vector>
 #include <map>
+#include <vector>
 
 #define _USE_MATH_DEFINES
 #include <cmath>
 
 // Filesystem stuff
-// It can either be in std filesystem (C++17), or in experimental/filesystem (partial C++17 support) or in boost
+// It can either be in std filesystem (C++17), or in experimental/filesystem
+// (partial C++17 support) or in boost
 #if __has_include(<boost/filesystem.hpp>)
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>

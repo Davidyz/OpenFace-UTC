@@ -3,17 +3,15 @@
 #ifndef DLIB_CREATE_IRIS_DAtAFILE_Hh_
 #define DLIB_CREATE_IRIS_DAtAFILE_Hh_
 
-namespace dlib
-{
-    void create_iris_datafile (
-    );
-    /*!
-        ensures
-            - Creates a local file called iris.scale that contains the
-              150 samples from the 3-class Iris dataset from the UCI
-              repository.  The file will be in LIBSVM format (it was
-              originally downloaded from the LIBSVM website).
-    !*/
-}
+namespace dlib {
+void create_iris_datafile();
+/*!
+    ensures
+        - Creates a local file called iris.scale that contains the
+          150 samples from the 3-class Iris dataset from the UCI
+          repository.  The file will be in LIBSVM format (it was
+          originally downloaded from the LIBSVM website).
+!*/
+} // namespace dlib
 
 #endif // DLIB_CREATE_IRIS_DAtAFILE_Hh_

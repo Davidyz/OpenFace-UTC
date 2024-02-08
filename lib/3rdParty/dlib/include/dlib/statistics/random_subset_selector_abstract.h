@@ -3,386 +3,323 @@
 #undef DLIB_RANDOM_SUBSeT_SELECTOR_ABSTRACT_H_
 #ifdef DLIB_RANDOM_SUBSeT_SELECTOR_ABSTRACT_H_
 
-#include <vector>
-#include "../rand/rand_kernel_abstract.h"
 #include "../algs.h"
+#include "../rand/rand_kernel_abstract.h"
 #include "../string.h"
+#include <vector>
 
-namespace dlib
-{
-    template <
-        typename T,
-        typename Rand_type = dlib::rand
-        >
-    class random_subset_selector
-    {
-        /*!
-            REQUIREMENTS ON T
-                T must be a copyable type
+namespace dlib {
+template <typename T, typename Rand_type = dlib::rand>
+class random_subset_selector {
+  /*!
+      REQUIREMENTS ON T
+          T must be a copyable type
 
-            REQUIREMENTS ON Rand_type
-                must be an implementation of dlib/rand/rand_kernel_abstract.h
+      REQUIREMENTS ON Rand_type
+          must be an implementation of dlib/rand/rand_kernel_abstract.h
 
-            INITIAL VALUE
-                - size() == 0
-                - max_size() == 0
-                - next_add_accepts() == false
+      INITIAL VALUE
+          - size() == 0
+          - max_size() == 0
+          - next_add_accepts() == false
 
-            WHAT THIS OBJECT REPRESENTS
-                This object is a tool to help you select a random subset of a large body of data.  
-                In particular, it is useful when the body of data is too large to fit into memory.
+      WHAT THIS OBJECT REPRESENTS
+          This object is a tool to help you select a random subset of a large
+  body of data. In particular, it is useful when the body of data is too large
+  to fit into memory.
 
-                So for example, suppose you have 1000000 data samples and you want to select a
-                random subset of size 1000.   Then you could do that as follows:
-                    
-                    random_subset_selector<sample_type> rand_subset;
-                    rand_subset.set_max_size(1000)
-                    for (int i = 0; i < 1000000; ++i)
-                        rand_subset.add( get_next_data_sample());
+          So for example, suppose you have 1000000 data samples and you want to
+  select a random subset of size 1000.   Then you could do that as follows:
 
-              
-                At the end of the for loop you will have your random subset of 1000 samples.  And by
-                random I mean that each of the 1000000 data samples has an equal chance of ending
-                up in the rand_subset object.
+              random_subset_selector<sample_type> rand_subset;
+              rand_subset.set_max_size(1000)
+              for (int i = 0; i < 1000000; ++i)
+                  rand_subset.add( get_next_data_sample());
 
 
-                Note that the above example calls get_next_data_sample() for each data sample.  This 
-                may be inefficient since most of the data samples are just ignored.  An alternative 
-                method that doesn't require you to load each sample can also be used.  Consider the 
-                following:
+          At the end of the for loop you will have your random subset of 1000
+  samples.  And by random I mean that each of the 1000000 data samples has an
+  equal chance of ending up in the rand_subset object.
 
-                    random_subset_selector<sample_type> rand_subset;
-                    rand_subset.set_max_size(1000)
-                    for (int i = 0; i < 1000000; ++i)
-                        if (rand_subset.next_add_accepts())
-                            rand_subset.add(get_data_sample(i));
-                        else
-                            rand_subset.add() 
 
-                In the above example we only actually fetch the data sample into memory if we
-                know that the rand_subset would include it into the random subset.  Otherwise,
-                we can just call the empty add().
-                
+          Note that the above example calls get_next_data_sample() for each data
+  sample.  This may be inefficient since most of the data samples are just
+  ignored.  An alternative method that doesn't require you to load each sample
+  can also be used.  Consider the following:
 
-                Finally, note that the random_subset_selector uses a deterministic pseudo-random
-                number generator under the hood.  Moreover, the default constructor always seeds
-                the random number generator in the same way.  So unless you call set_seed() 
-                each instance of the random_subset_selector will function identically.
-        !*/
-    public:
-        typedef T type;
-        typedef T value_type;
-        typedef default_memory_manager mem_manager_type;
-        typedef Rand_type rand_type;
+              random_subset_selector<sample_type> rand_subset;
+              rand_subset.set_max_size(1000)
+              for (int i = 0; i < 1000000; ++i)
+                  if (rand_subset.next_add_accepts())
+                      rand_subset.add(get_data_sample(i));
+                  else
+                      rand_subset.add()
 
-        typedef typename std::vector<T>::iterator iterator;
-        typedef typename std::vector<T>::const_iterator const_iterator;
+          In the above example we only actually fetch the data sample into
+  memory if we know that the rand_subset would include it into the random
+  subset.  Otherwise, we can just call the empty add().
 
-        random_subset_selector (
-        );
-        /*!
-            ensures
-                - this object is properly initialized
-        !*/
 
-        void set_seed(
-            const std::string& value
-        );
-        /*!
-            ensures
-                - sets the seed of the random number generator that is embedded in
-                  this object to the given value.
-        !*/
+          Finally, note that the random_subset_selector uses a deterministic
+  pseudo-random number generator under the hood.  Moreover, the default
+  constructor always seeds the random number generator in the same way.  So
+  unless you call set_seed() each instance of the random_subset_selector will
+  function identically.
+  !*/
+public:
+  typedef T type;
+  typedef T value_type;
+  typedef default_memory_manager mem_manager_type;
+  typedef Rand_type rand_type;
 
-        void make_empty (
-        );
-        /*!
-            ensures
-                - #size() == 0
-        !*/
+  typedef typename std::vector<T>::iterator iterator;
+  typedef typename std::vector<T>::const_iterator const_iterator;
 
-        size_t size (
-        ) const;
-        /*!
-            ensures
-                - returns the number of items of type T currently contained in this object
-        !*/
+  random_subset_selector();
+  /*!
+      ensures
+          - this object is properly initialized
+  !*/
 
-        void set_max_size (
-            unsigned long new_max_size
-        );
-        /*!
-            ensures
-                - #max_size() == new_max_size
-                - #size() == 0
-        !*/
+  void set_seed(const std::string &value);
+  /*!
+      ensures
+          - sets the seed of the random number generator that is embedded in
+            this object to the given value.
+  !*/
 
-        unsigned long max_size (
-        ) const;
-        /*!
-            ensures
-                - returns the maximum allowable size for this object
-        !*/
+  void make_empty();
+  /*!
+      ensures
+          - #size() == 0
+  !*/
 
-        T& operator[] (
-            unsigned long idx
-        );
-        /*!
-            requires
-                - idx < size()
-            ensures
-                - returns a non-const reference to the idx'th element of this object
-        !*/
+  size_t size() const;
+  /*!
+      ensures
+          - returns the number of items of type T currently contained in this
+  object
+  !*/
 
-        const T& operator[] (
-            unsigned long idx
-        ) const;
-        /*!
-            requires
-                - idx < size()
-            ensures
-                - returns a const reference to the idx'th element of this object
-        !*/
+  void set_max_size(unsigned long new_max_size);
+  /*!
+      ensures
+          - #max_size() == new_max_size
+          - #size() == 0
+  !*/
 
-        bool next_add_accepts (
-        ) const;
-        /*!
-            ensures
-                - if (the next call to add(item) will result in item being included
-                  into *this) then
-                    - returns true
-                    - Note that the next item will always be accepted if size() < max_size().
-                - else
-                    - returns false
-                    - Note that the next item will never be accepted if max_size() == 0.
-        !*/
+  unsigned long max_size() const;
+  /*!
+      ensures
+          - returns the maximum allowable size for this object
+  !*/
 
-        void add (
-            const T& new_item
-        );
-        /*!
-            ensures
-                - if (next_add_accepts()) then
-                    - places new_item into *this object at a random location
-                    - if (size() < max_size()) then
-                        - #size() == size() + 1
-                - #next_add_accepts() == The updated information about the acceptance
-                  of the next call to add()
-        !*/
+  T &operator[](unsigned long idx);
+  /*!
+      requires
+          - idx < size()
+      ensures
+          - returns a non-const reference to the idx'th element of this object
+  !*/
 
-        void add (
-        );
-        /*!
-            requires
-                - next_add_accepts() == false
-            ensures
-                - This function does nothing but update the value of #next_add_accepts()
-        !*/
+  const T &operator[](unsigned long idx) const;
+  /*!
+      requires
+          - idx < size()
+      ensures
+          - returns a const reference to the idx'th element of this object
+  !*/
 
-        iterator begin(
-        );
-        /*!
-            ensures
-                - if (size() > 0) then
-                    - returns an iterator referring to the first element in 
-                      this container.
-                - else
-                    - returns end()
-        !*/
-        
-        const_iterator begin(
-        ) const;
-        /*!
-            ensures
-                - if (size() > 0) then
-                    - returns a const_iterator referring to the first element in 
-                      this container.
-                - else
-                    - returns end()
-        !*/
+  bool next_add_accepts() const;
+  /*!
+      ensures
+          - if (the next call to add(item) will result in item being included
+            into *this) then
+              - returns true
+              - Note that the next item will always be accepted if size() <
+  max_size().
+          - else
+              - returns false
+              - Note that the next item will never be accepted if max_size() ==
+  0.
+  !*/
 
-        iterator end(
-        ); 
-        /*!
-            ensures
-                - returns an iterator that represents one past the end of
-                  this container
-        !*/
+  void add(const T &new_item);
+  /*!
+      ensures
+          - if (next_add_accepts()) then
+              - places new_item into *this object at a random location
+              - if (size() < max_size()) then
+                  - #size() == size() + 1
+          - #next_add_accepts() == The updated information about the acceptance
+            of the next call to add()
+  !*/
 
-        const_iterator end(
-        ) const;
-        /*!
-            ensures
-                - returns an iterator that represents one past the end of
-                  this container
-        !*/
+  void add();
+  /*!
+      requires
+          - next_add_accepts() == false
+      ensures
+          - This function does nothing but update the value of
+  #next_add_accepts()
+  !*/
 
-        const std::vector<T>& to_std_vector(
-        ) const;
-        /*!
-            ensures
-                - returns a const reference to the underlying std::vector<T> that contains
-                  all elements in this object.  That is, this function returns a vector, V,
-                  which has the following properties:  
-                    - V.size()  == this->size()
-                    - V.begin() == this->begin()
-                    - V.end()   == this->end()
-        !*/
+  iterator begin();
+  /*!
+      ensures
+          - if (size() > 0) then
+              - returns an iterator referring to the first element in
+                this container.
+          - else
+              - returns end()
+  !*/
 
-        void swap (
-            random_subset_selector& item
-        );
-        /*!
-            ensures
-                - swaps *this and item
-        !*/
+  const_iterator begin() const;
+  /*!
+      ensures
+          - if (size() > 0) then
+              - returns a const_iterator referring to the first element in
+                this container.
+          - else
+              - returns end()
+  !*/
 
-    };
+  iterator end();
+  /*!
+      ensures
+          - returns an iterator that represents one past the end of
+            this container
+  !*/
 
-    template <
-        typename T,
-        typename rand_type 
-        >
-    void swap (
-        random_subset_selector<T,rand_type>& a,
-        random_subset_selector<T,rand_type>& b
-    ) { a.swap(b); }
-    /*!
-        provides global swap support
-    !*/
+  const_iterator end() const;
+  /*!
+      ensures
+          - returns an iterator that represents one past the end of
+            this container
+  !*/
 
-    template <
-        typename T,
-        typename rand_type 
-        >
-    void serialize (
-        const random_subset_selector<T,rand_type>& item,
-        std::ostream& out 
-    );   
-    /*!
-        provides serialization support 
-    !*/
+  const std::vector<T> &to_std_vector() const;
+  /*!
+      ensures
+          - returns a const reference to the underlying std::vector<T> that
+  contains all elements in this object.  That is, this function returns a
+  vector, V, which has the following properties:
+              - V.size()  == this->size()
+              - V.begin() == this->begin()
+              - V.end()   == this->end()
+  !*/
 
-    template <
-        typename T,
-        typename rand_type 
-        >
-    void deserialize (
-        random_subset_selector<T,rand_type>& item,
-        std::istream& in
-    );   
-    /*!
-        provides deserialization support 
-    !*/
+  void swap(random_subset_selector &item);
+  /*!
+      ensures
+          - swaps *this and item
+  !*/
+};
 
-// ----------------------------------------------------------------------------------------
-
-    template <
-        typename T,
-        typename alloc
-        >
-    random_subset_selector<T> randomly_subsample (
-        const std::vector<T,alloc>& samples,
-        unsigned long num
-    );
-    /*!
-        ensures
-            - returns a random subset R such that:
-                - R contains a random subset of the given samples
-                - R.size() == min(num, samples.size())
-                - R.max_size() == num
-            - The random number generator used by this function will always be
-              initialized in the same way.  I.e. this function will always pick
-              the same random subsample if called multiple times.
-    !*/
-
-// ----------------------------------------------------------------------------------------
-
-    template <
-        typename T,
-        typename alloc,
-        typename U
-        >
-    random_subset_selector<T> randomly_subsample (
-        const std::vector<T,alloc>& samples,
-        unsigned long num,
-        const U& random_seed
-    );
-    /*!
-        requires
-            - random_seed must be convertible to a string by dlib::cast_to_string()
-        ensures
-            - returns a random subset R such that:
-                - R contains a random subset of the given samples
-                - R.size() == min(num, samples.size())
-                - R.max_size() == num
-            - The given random_seed will be used to initialize the random number
-              generator used by this function.
-    !*/
-
-// ----------------------------------------------------------------------------------------
-
-    template <
-        typename T
-        >
-    random_subset_selector<T> randomly_subsample (
-        const random_subset_selector<T>& samples,
-        unsigned long num
-    );
-    /*!
-        ensures
-            - returns a random subset R such that:
-                - R contains a random subset of the given samples
-                - R.size() == min(num, samples.size())
-                - R.max_size() == num
-            - The random number generator used by this function will always be
-              initialized in the same way.  I.e. this function will always pick
-              the same random subsample if called multiple times.
-    !*/
-
-// ----------------------------------------------------------------------------------------
-
-    template <
-        typename T,
-        typename U
-        >
-    random_subset_selector<T> randomly_subsample (
-        const random_subset_selector<T>& samples,
-        unsigned long num,
-        const U& random_seed
-    );
-    /*!
-        requires
-            - random_seed must be convertible to a string by dlib::cast_to_string()
-        ensures
-            - returns a random subset R such that:
-                - R contains a random subset of the given samples
-                - R.size() == min(num, samples.size())
-                - R.max_size() == num
-            - The given random_seed will be used to initialize the random number
-              generator used by this function.
-    !*/
-
-// ----------------------------------------------------------------------------------------
-
-    template <
-        typename T
-        >
-    const matrix_exp mat (
-        const random_subset_selector<T>& m 
-    );
-    /*!
-        ensures
-            - returns a matrix R such that:
-                - is_col_vector(R) == true 
-                - R.size() == m.size()
-                - for all valid r:
-                  R(r) == m[r]
-    !*/
-
-// ----------------------------------------------------------------------------------------
-
+template <typename T, typename rand_type>
+void swap(random_subset_selector<T, rand_type> &a,
+          random_subset_selector<T, rand_type> &b) {
+  a.swap(b);
 }
+/*!
+    provides global swap support
+!*/
+
+template <typename T, typename rand_type>
+void serialize(const random_subset_selector<T, rand_type> &item,
+               std::ostream &out);
+/*!
+    provides serialization support
+!*/
+
+template <typename T, typename rand_type>
+void deserialize(random_subset_selector<T, rand_type> &item, std::istream &in);
+/*!
+    provides deserialization support
+!*/
+
+// ----------------------------------------------------------------------------------------
+
+template <typename T, typename alloc>
+random_subset_selector<T>
+randomly_subsample(const std::vector<T, alloc> &samples, unsigned long num);
+/*!
+    ensures
+        - returns a random subset R such that:
+            - R contains a random subset of the given samples
+            - R.size() == min(num, samples.size())
+            - R.max_size() == num
+        - The random number generator used by this function will always be
+          initialized in the same way.  I.e. this function will always pick
+          the same random subsample if called multiple times.
+!*/
+
+// ----------------------------------------------------------------------------------------
+
+template <typename T, typename alloc, typename U>
+random_subset_selector<T>
+randomly_subsample(const std::vector<T, alloc> &samples, unsigned long num,
+                   const U &random_seed);
+/*!
+    requires
+        - random_seed must be convertible to a string by dlib::cast_to_string()
+    ensures
+        - returns a random subset R such that:
+            - R contains a random subset of the given samples
+            - R.size() == min(num, samples.size())
+            - R.max_size() == num
+        - The given random_seed will be used to initialize the random number
+          generator used by this function.
+!*/
+
+// ----------------------------------------------------------------------------------------
+
+template <typename T>
+random_subset_selector<T>
+randomly_subsample(const random_subset_selector<T> &samples, unsigned long num);
+/*!
+    ensures
+        - returns a random subset R such that:
+            - R contains a random subset of the given samples
+            - R.size() == min(num, samples.size())
+            - R.max_size() == num
+        - The random number generator used by this function will always be
+          initialized in the same way.  I.e. this function will always pick
+          the same random subsample if called multiple times.
+!*/
+
+// ----------------------------------------------------------------------------------------
+
+template <typename T, typename U>
+random_subset_selector<T>
+randomly_subsample(const random_subset_selector<T> &samples, unsigned long num,
+                   const U &random_seed);
+/*!
+    requires
+        - random_seed must be convertible to a string by dlib::cast_to_string()
+    ensures
+        - returns a random subset R such that:
+            - R contains a random subset of the given samples
+            - R.size() == min(num, samples.size())
+            - R.max_size() == num
+        - The given random_seed will be used to initialize the random number
+          generator used by this function.
+!*/
+
+// ----------------------------------------------------------------------------------------
+
+template <typename T> const matrix_exp mat(const random_subset_selector<T> &m);
+/*!
+    ensures
+        - returns a matrix R such that:
+            - is_col_vector(R) == true
+            - R.size() == m.size()
+            - for all valid r:
+              R(r) == m[r]
+!*/
+
+// ----------------------------------------------------------------------------------------
+
+} // namespace dlib
 
 #endif // DLIB_RANDOM_SUBSeT_SELECTOR_ABSTRACT_H_
-

@@ -6,5 +6,3 @@
 #include "timeout/timeout.h"
 
 #endif // DLIB_TIMEOUt_
-
-

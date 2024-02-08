@@ -6,25 +6,18 @@
 #include "mlp/mlp_kernel_1.h"
 #include "mlp/mlp_kernel_c.h"
 
-namespace dlib
-{
+namespace dlib {
 
-    class mlp
-    {
-        mlp() {}
+class mlp {
+  mlp() {}
 
-    public:
-        
-        //----------- kernels ---------------
+public:
+  //----------- kernels ---------------
 
-        // kernel_1a        
-        typedef     mlp_kernel_1    
-                    kernel_1a;
-        typedef     mlp_kernel_c<kernel_1a >
-                    kernel_1a_c;   
-
-    };
-}
+  // kernel_1a
+  typedef mlp_kernel_1 kernel_1a;
+  typedef mlp_kernel_c<kernel_1a> kernel_1a_c;
+};
+} // namespace dlib
 
 #endif // DLIB_MLp_
-

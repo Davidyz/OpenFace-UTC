@@ -11,7 +11,3 @@
 #include "opencv/to_open_cv.h"
 
 #endif // DLIB_OPEnCV_HEADER
-
-
-
-

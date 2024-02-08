@@ -7,6 +7,3 @@
 #include "filtering/rls_filter.h"
 
 #endif // DLIB_FILTERiNG_HEADER
-
-
-

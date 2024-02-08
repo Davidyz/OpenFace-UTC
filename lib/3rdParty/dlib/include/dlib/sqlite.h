@@ -6,6 +6,3 @@
 #include "sqlite/sqlite_tools.h"
 
 #endif // DLIB_SVm_HEADER
-
-
-

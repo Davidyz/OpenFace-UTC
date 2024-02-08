@@ -5,13 +5,9 @@
 #include "dlib_basic_cpp_build_tutorial.txt"
 #endif
 
-
 #ifndef DLIB_BRIdGE_
-#define DLIB_BRIdGE_ 
-
+#define DLIB_BRIdGE_
 
 #include "bridge/bridge.h"
 
-#endif // DLIB_BRIdGE_ 
-
-
+#endif // DLIB_BRIdGE_

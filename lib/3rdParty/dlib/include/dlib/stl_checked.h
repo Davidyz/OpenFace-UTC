@@ -6,5 +6,3 @@
 #include "stl_checked/std_vector_c.h"
 
 #endif // DLIB_STL_CHECKEd_HEADER
-
-

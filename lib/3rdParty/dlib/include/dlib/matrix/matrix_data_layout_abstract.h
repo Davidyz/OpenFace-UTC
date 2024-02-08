@@ -5,36 +5,31 @@
 
 #include "../algs.h"
 
-namespace dlib
-{
+namespace dlib {
 
 // ----------------------------------------------------------------------------------------
 
-    struct row_major_layout
-    {
-        /*!
-            This is the default matrix layout.  Any matrix object that uses this
-            layout will be laid out in memory in row major order.  Additionally,
-            all elements are contiguous (e.g. there isn't any padding at the ends of
-            rows or anything like that)
-        !*/
-    };
+struct row_major_layout {
+  /*!
+      This is the default matrix layout.  Any matrix object that uses this
+      layout will be laid out in memory in row major order.  Additionally,
+      all elements are contiguous (e.g. there isn't any padding at the ends of
+      rows or anything like that)
+  !*/
+};
 
 // ----------------------------------------------------------------------------------------
 
-    struct column_major_layout
-    {
-        /*!
-            Any matrix object that uses this layout will be laid out in memory in 
-            column major order.  Additionally, all elements are contiguous (e.g. 
-            there isn't any padding at the ends of rows or anything like that)
-        !*/
-    };
+struct column_major_layout {
+  /*!
+      Any matrix object that uses this layout will be laid out in memory in
+      column major order.  Additionally, all elements are contiguous (e.g.
+      there isn't any padding at the ends of rows or anything like that)
+  !*/
+};
 
 // ----------------------------------------------------------------------------------------
 
-}
+} // namespace dlib
 
 #endif // DLIB_MATRIx_DATA_LAYOUT_ABSTRACT_
-
-

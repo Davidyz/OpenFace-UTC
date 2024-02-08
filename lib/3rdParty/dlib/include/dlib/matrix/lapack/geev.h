@@ -3,59 +3,47 @@
 #ifndef DLIB_LAPACk_GEEV_Hh_
 #define DLIB_LAPACk_GEEV_Hh_
 
-#include "fortran_id.h"
 #include "../matrix.h"
+#include "fortran_id.h"
 
-namespace dlib
-{
-    namespace lapack
-    {
-        namespace binding
-        {
-            extern "C"
-            {
-                void DLIB_FORTRAN_ID(dgeev) (char *jobvl, char *jobvr, integer *n, double * a, 
-                                             integer *lda, double *wr, double *wi, double *vl, 
-                                             integer *ldvl, double *vr, integer *ldvr, double *work, 
-                                             integer *lwork, integer *info);
+namespace dlib {
+namespace lapack {
+namespace binding {
+extern "C" {
+void DLIB_FORTRAN_ID(dgeev)(char *jobvl, char *jobvr, integer *n, double *a,
+                            integer *lda, double *wr, double *wi, double *vl,
+                            integer *ldvl, double *vr, integer *ldvr,
+                            double *work, integer *lwork, integer *info);
 
-                void DLIB_FORTRAN_ID(sgeev) (char *jobvl, char *jobvr, integer *n, float * a, 
-                                             integer *lda, float *wr, float *wi, float *vl, 
-                                             integer *ldvl, float *vr, integer *ldvr, float *work, 
-                                             integer *lwork, integer *info);
+void DLIB_FORTRAN_ID(sgeev)(char *jobvl, char *jobvr, integer *n, float *a,
+                            integer *lda, float *wr, float *wi, float *vl,
+                            integer *ldvl, float *vr, integer *ldvr,
+                            float *work, integer *lwork, integer *info);
+}
 
-            }
+inline int geev(char jobvl, char jobvr, integer n, double *a, integer lda,
+                double *wr, double *wi, double *vl, integer ldvl, double *vr,
+                integer ldvr, double *work, integer lwork) {
+  integer info = 0;
+  DLIB_FORTRAN_ID(dgeev)
+  (&jobvl, &jobvr, &n, a, &lda, wr, wi, vl, &ldvl, vr, &ldvr, work, &lwork,
+   &info);
+  return info;
+}
 
-            inline int geev (char jobvl, char jobvr, integer n, double *a, 
-                             integer lda, double *wr, double *wi, double *vl, 
-                             integer ldvl, double *vr, integer ldvr, double *work, 
-                             integer lwork)
-            {
-                integer info = 0;
-                DLIB_FORTRAN_ID(dgeev)(&jobvl, &jobvr, &n, a,
-                                       &lda, wr, wi, vl, 
-                                       &ldvl, vr, &ldvr, work,
-                                       &lwork, &info);
-                return info;
-            }
+inline int geev(char jobvl, char jobvr, integer n, float *a, integer lda,
+                float *wr, float *wi, float *vl, integer ldvl, float *vr,
+                integer ldvr, float *work, integer lwork) {
+  integer info = 0;
+  DLIB_FORTRAN_ID(sgeev)
+  (&jobvl, &jobvr, &n, a, &lda, wr, wi, vl, &ldvl, vr, &ldvr, work, &lwork,
+   &info);
+  return info;
+}
 
-            inline int geev (char jobvl, char jobvr, integer n, float *a, 
-                             integer lda, float *wr, float *wi, float *vl, 
-                             integer ldvl, float *vr, integer ldvr, float *work, 
-                             integer lwork)
-            {
-                integer info = 0;
-                DLIB_FORTRAN_ID(sgeev)(&jobvl, &jobvr, &n, a,
-                                       &lda, wr, wi, vl, 
-                                       &ldvl, vr, &ldvr, work,
-                                       &lwork, &info);
-                return info;
-            }
+} // namespace binding
 
-
-        }
-
-    // ------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------
 
 /*  -- LAPACK driver routine (version 3.1) -- */
 /*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
@@ -141,7 +129,8 @@ namespace dlib
 /*          The leading dimension of the array VR.  LDVR >= 1; if */
 /*          JOBVR = 'V', LDVR >= N. */
 
-/*  WORK    (workspace/output) DOUBLE PRECISION array, dimension (MAX(1,LWORK)) */
+/*  WORK    (workspace/output) DOUBLE PRECISION array, dimension (MAX(1,LWORK))
+ */
 /*          On exit, if INFO = 0, WORK(1) returns the optimal LWORK. */
 
 /*  LWORK   (input) INTEGER */
@@ -162,73 +151,60 @@ namespace dlib
 /*                elements i+1:N of WR and WI contain eigenvalues which */
 /*                have converged. */
 
-    // ------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------
 
-        template <
-            typename T, 
-            long NR1, long NR2, long NR3, long NR4, long NR5,
-            long NC1, long NC2, long NC3, long NC4, long NC5,
-            typename MM,
-            typename layout
-            >
-        int geev (
-            const char jobvl,
-            const char jobvr,
-            matrix<T,NR1,NC1,MM,column_major_layout>& a,
-            matrix<T,NR2,NC2,MM,layout>& wr,
-            matrix<T,NR3,NC3,MM,layout>& wi,
-            matrix<T,NR4,NC4,MM,column_major_layout>& vl,
-            matrix<T,NR5,NC5,MM,column_major_layout>& vr
-        )
-        {
-            matrix<T,0,1,MM,column_major_layout> work;
+template <typename T, long NR1, long NR2, long NR3, long NR4, long NR5,
+          long NC1, long NC2, long NC3, long NC4, long NC5, typename MM,
+          typename layout>
+int geev(const char jobvl, const char jobvr,
+         matrix<T, NR1, NC1, MM, column_major_layout> &a,
+         matrix<T, NR2, NC2, MM, layout> &wr,
+         matrix<T, NR3, NC3, MM, layout> &wi,
+         matrix<T, NR4, NC4, MM, column_major_layout> &vl,
+         matrix<T, NR5, NC5, MM, column_major_layout> &vr) {
+  matrix<T, 0, 1, MM, column_major_layout> work;
 
-            const long n = a.nr();
+  const long n = a.nr();
 
-            wr.set_size(n,1);
-            wi.set_size(n,1);
+  wr.set_size(n, 1);
+  wi.set_size(n, 1);
 
-            if (jobvl == 'V')
-                vl.set_size(n,n);
-            else
-                vl.set_size(NR4?NR4:1, NC4?NC4:1);
+  if (jobvl == 'V')
+    vl.set_size(n, n);
+  else
+    vl.set_size(NR4 ? NR4 : 1, NC4 ? NC4 : 1);
 
-            if (jobvr == 'V')
-                vr.set_size(n,n);
-            else
-                vr.set_size(NR5?NR5:1, NC5?NC5:1);
+  if (jobvr == 'V')
+    vr.set_size(n, n);
+  else
+    vr.set_size(NR5 ? NR5 : 1, NC5 ? NC5 : 1);
 
+  // figure out how big the workspace needs to be.
+  T work_size = 1;
+  int info =
+      binding::geev(jobvl, jobvr, n, &a(0, 0), a.nr(), &wr(0, 0), &wi(0, 0),
+                    &vl(0, 0), vl.nr(), &vr(0, 0), vr.nr(), &work_size, -1);
 
-            // figure out how big the workspace needs to be.
-            T work_size = 1;
-            int info = binding::geev(jobvl, jobvr, n, &a(0,0),
-                                     a.nr(), &wr(0,0), &wi(0,0), &vl(0,0),
-                                     vl.nr(), &vr(0,0), vr.nr(), &work_size, 
-                                     -1);
+  if (info != 0)
+    return info;
 
-            if (info != 0)
-                return info;
+  if (work.size() < work_size)
+    work.set_size(static_cast<long>(work_size), 1);
 
-            if (work.size() < work_size)
-                work.set_size(static_cast<long>(work_size), 1);
+  // compute the actual decomposition
+  info = binding::geev(jobvl, jobvr, n, &a(0, 0), a.nr(), &wr(0, 0), &wi(0, 0),
+                       &vl(0, 0), vl.nr(), &vr(0, 0), vr.nr(), &work(0, 0),
+                       work.size());
 
-            // compute the actual decomposition 
-            info = binding::geev(jobvl, jobvr, n, &a(0,0),
-                                 a.nr(), &wr(0,0), &wi(0,0), &vl(0,0),
-                                 vl.nr(), &vr(0,0), vr.nr(), &work(0,0), 
-                                 work.size());
-
-            return info;
-        }
-
-    // ------------------------------------------------------------------------------------
-
-    }
-
+  return info;
 }
+
+// ------------------------------------------------------------------------------------
+
+} // namespace lapack
+
+} // namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
 #endif // DLIB_LAPACk_GEEV_Hh_
-
-

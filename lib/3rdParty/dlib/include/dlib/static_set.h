@@ -3,47 +3,29 @@
 #ifndef DLIB_STATIC_SEt_
 #define DLIB_STATIC_SEt_
 
+#include "static_set/static_set_compare_1.h"
 #include "static_set/static_set_kernel_1.h"
 #include "static_set/static_set_kernel_c.h"
-#include "static_set/static_set_compare_1.h"
 
 #include <functional>
 
-namespace dlib
-{
+namespace dlib {
 
-    template <
-        typename T,
-        typename compare = std::less<T>
-        >
-    class static_set
-    {
-        static_set() {}
+template <typename T, typename compare = std::less<T>> class static_set {
+  static_set() {}
 
+public:
+  //----------- kernels ---------------
 
-    public:
-        
-        //----------- kernels ---------------
+  // kernel_1a
+  typedef static_set_kernel_1<T, compare> kernel_1a;
+  typedef static_set_kernel_c<kernel_1a> kernel_1a_c;
 
-        // kernel_1a        
-        typedef     static_set_kernel_1<T,compare>
-                    kernel_1a;
-        typedef     static_set_kernel_c<kernel_1a>
-                    kernel_1a_c;
-        
-   
-        //----------- extensions -------------
+  //----------- extensions -------------
 
-        typedef     static_set_compare_1<kernel_1a>
-                    compare_1a;
-        typedef     static_set_compare_1<kernel_1a_c>
-                    compare_1a_c;
-
-
-
-
-    };
-}
+  typedef static_set_compare_1<kernel_1a> compare_1a;
+  typedef static_set_compare_1<kernel_1a_c> compare_1a_c;
+};
+} // namespace dlib
 
 #endif // DLIB_STATIC_SEt_
-

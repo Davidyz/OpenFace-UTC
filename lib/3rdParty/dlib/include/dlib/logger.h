@@ -3,9 +3,8 @@
 #ifndef DLIB_LOGGEr_
 #define DLIB_LOGGEr_
 
-#include "logger/logger_kernel_1.h"
 #include "logger/extra_logger_headers.h"
 #include "logger/logger_config_file.h"
+#include "logger/logger_kernel_1.h"
 
-#endif // DLIB_LOGGEr_ 
-
+#endif // DLIB_LOGGEr_
