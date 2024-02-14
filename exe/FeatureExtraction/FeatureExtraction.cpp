@@ -120,7 +120,7 @@ int main(int argc, char **argv) {
     char error_opening_serial = serial.openDevice(serial_path.c_str(), 9600);
     if (error_opening_serial != 1)
       return error_opening_serial;
-    printf("Successful connection to %s\n", SERIAL_PORT);
+    printf("Successful connection to %s\n", serial_path.c_str());
   }
 
   // Load the modules that are being used for tracking and face analysis
