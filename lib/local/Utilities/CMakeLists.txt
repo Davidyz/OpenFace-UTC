@@ -7,8 +7,7 @@ set(SOURCE
     src/SequenceCapture.cpp
     src/stdafx_ut.cpp
     src/VisualizationUtils.cpp
-    src/Visualizer.cpp
-    src/serialib.cpp)
+    src/Visualizer.cpp)
 
 set(HEADERS
     include/ImageCapture.h
@@ -20,8 +19,7 @@ set(HEADERS
     include/stdafx_ut.h
     include/VisualizationUtils.h
     include/Visualizer.h
-    include/ConcurrentQueue.h
-    include/serialib.h)
+    include/ConcurrentQueue.h)
 
 add_library(Utilities ${SOURCE} ${HEADERS})
 add_library(OpenFace::Utilities ALIAS Utilities)

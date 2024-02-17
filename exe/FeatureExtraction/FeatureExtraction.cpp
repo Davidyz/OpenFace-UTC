@@ -54,7 +54,6 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#include <serialib.h>
 #include <string>
 
 #ifndef CONFIG_DIR
@@ -85,15 +84,6 @@ std::vector<std::string> get_arguments(int argc, char **argv) {
   return arguments;
 }
 
-std::string get_serial(std::vector<std::string> args) {
-  for (std::size_t i = 0; i < args.size(); i++) {
-    if (args[i] == "--serial" && i < args.size() - 1) {
-      return args[i + 1];
-    }
-  }
-  return "";
-}
-
 double getUTCTimestamp() {
   auto now = std::chrono::system_clock::now();
   auto duration = now.time_since_epoch();
@@ -112,15 +102,6 @@ int main(int argc, char **argv) {
     std::cout << " https://github.com/TadasBaltrusaitis/OpenFace/wiki/"
                  "Command-line-arguments";
     return 0;
-  }
-
-  std::string serial_path = get_serial(arguments);
-  serialib serial;
-  if (!serial_path.empty()) {
-    char error_opening_serial = serial.openDevice(serial_path.c_str(), 9600);
-    if (error_opening_serial != 1)
-      return error_opening_serial;
-    printf("Successful connection to %s\n", serial_path.c_str());
   }
 
   // Load the modules that are being used for tracking and face analysis
@@ -202,22 +183,6 @@ int main(int argc, char **argv) {
     while (!captured_image.empty()) {
       // Converting to grayscale
       cv::Mat_<uchar> grayscale_image = sequence_reader.GetGrayFrame();
-
-      char *serial_data = (char *)calloc(100, sizeof(char));
-      int serial_return_length = -1;
-      if (!serial_path.empty()) {
-        serial.writeString("pull;");
-        serial_return_length = serial.readString(serial_data, ';', 10000, 1);
-      } else {
-        std::strcpy(serial_data, "0;");
-      }
-      printf("serial data: %s\n", serial_data);
-      if (serial_data[serial_return_length - 1] == ';')
-        serial_return_length--;
-
-      int serial_val;
-      sscanf(serial_data, "%d", &serial_val);
-      printf("serial val: %d\n", serial_val);
 
       // The actual facial landmark detection / tracking
       bool detection_success = LandmarkDetector::DetectLandmarksInVideo(
