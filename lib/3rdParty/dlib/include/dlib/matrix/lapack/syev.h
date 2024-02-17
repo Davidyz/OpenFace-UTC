@@ -3,49 +3,39 @@
 #ifndef DLIB_LAPACk_EV_Hh_
 #define DLIB_LAPACk_EV_Hh_
 
-#include "fortran_id.h"
 #include "../matrix.h"
+#include "fortran_id.h"
 
-namespace dlib
-{
-    namespace lapack
-    {
-        namespace binding
-        {
-            extern "C"
-            {
-                void DLIB_FORTRAN_ID(dsyev) (char *jobz, char *uplo, integer *n, double *a,
-                                             integer *lda, double *w, double *work, integer *lwork, 
-                                             integer *info);
+namespace dlib {
+namespace lapack {
+namespace binding {
+extern "C" {
+void DLIB_FORTRAN_ID(dsyev)(char *jobz, char *uplo, integer *n, double *a,
+                            integer *lda, double *w, double *work,
+                            integer *lwork, integer *info);
 
-                void DLIB_FORTRAN_ID(ssyev) (char *jobz, char *uplo, integer *n, float *a,
-                                             integer *lda, float *w, float *work, integer *lwork, 
-                                             integer *info);
+void DLIB_FORTRAN_ID(ssyev)(char *jobz, char *uplo, integer *n, float *a,
+                            integer *lda, float *w, float *work, integer *lwork,
+                            integer *info);
+}
 
-            }
+inline int syev(char jobz, char uplo, integer n, double *a, integer lda,
+                double *w, double *work, integer lwork) {
+  integer info = 0;
+  DLIB_FORTRAN_ID(dsyev)(&jobz, &uplo, &n, a, &lda, w, work, &lwork, &info);
+  return info;
+}
 
-            inline int syev (char jobz, char uplo, integer n, double *a,
-                             integer lda, double *w, double *work, integer lwork)
-            {
-                integer info = 0;
-                DLIB_FORTRAN_ID(dsyev)(&jobz, &uplo, &n, a,
-                                       &lda, w, work, &lwork, &info);
-                return info;
-            }
+inline int syev(char jobz, char uplo, integer n, float *a, integer lda,
+                float *w, float *work, integer lwork) {
+  integer info = 0;
+  DLIB_FORTRAN_ID(ssyev)(&jobz, &uplo, &n, a, &lda, w, work, &lwork, &info);
+  return info;
+}
 
-            inline int syev (char jobz, char uplo, integer n, float *a,
-                             integer lda, float *w, float *work, integer lwork)
-            {
-                integer info = 0;
-                DLIB_FORTRAN_ID(ssyev)(&jobz, &uplo, &n, a,
-                                       &lda, w, work, &lwork, &info);
-                return info;
-            }
+} // namespace binding
 
-
-        }
-
-    // ------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------
 
 /*  -- LAPACK driver routine (version 3.1) -- */
 /*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
@@ -94,7 +84,8 @@ namespace dlib
 /*  W       (output) DOUBLE PRECISION array, dimension (N) */
 /*          If INFO = 0, the eigenvalues in ascending order. */
 
-/*  WORK    (workspace/output) DOUBLE PRECISION array, dimension (MAX(1,LWORK)) */
+/*  WORK    (workspace/output) DOUBLE PRECISION array, dimension (MAX(1,LWORK))
+ */
 /*          On exit, if INFO = 0, WORK(1) returns the optimal LWORK. */
 
 /*  LWORK   (input) INTEGER */
@@ -114,105 +105,78 @@ namespace dlib
 /*                off-diagonal elements of an intermediate tridiagonal */
 /*                form did not converge to zero. */
 
+// ------------------------------------------------------------------------------------
 
-    // ------------------------------------------------------------------------------------
+template <typename T, long NR1, long NR2, long NC1, long NC2, typename MM>
+int syev(const char jobz, const char uplo,
+         matrix<T, NR1, NC1, MM, column_major_layout> &a,
+         matrix<T, NR2, NC2, MM, column_major_layout> &w) {
+  matrix<T, 0, 1, MM, column_major_layout> work;
 
-        template <
-            typename T, 
-            long NR1, long NR2, 
-            long NC1, long NC2,
-            typename MM
-            >
-        int syev (
-            const char jobz,
-            const char uplo,
-            matrix<T,NR1,NC1,MM,column_major_layout>& a,
-            matrix<T,NR2,NC2,MM,column_major_layout>& w
-        )
-        {
-            matrix<T,0,1,MM,column_major_layout> work;
+  const long n = a.nr();
 
-            const long n = a.nr();
+  w.set_size(n, 1);
 
-            w.set_size(n,1);
+  // figure out how big the workspace needs to be.
+  T work_size = 1;
+  int info =
+      binding::syev(jobz, uplo, n, &a(0, 0), a.nr(), &w(0, 0), &work_size, -1);
 
+  if (info != 0)
+    return info;
 
-            // figure out how big the workspace needs to be.
-            T work_size = 1;
-            int info = binding::syev(jobz, uplo, n, &a(0,0),
-                                     a.nr(), &w(0,0), &work_size, -1);
+  if (work.size() < work_size)
+    work.set_size(static_cast<long>(work_size), 1);
 
-            if (info != 0)
-                return info;
+  // compute the actual decomposition
+  info = binding::syev(jobz, uplo, n, &a(0, 0), a.nr(), &w(0, 0), &work(0, 0),
+                       work.size());
 
-            if (work.size() < work_size)
-                work.set_size(static_cast<long>(work_size), 1);
-
-            // compute the actual decomposition 
-            info = binding::syev(jobz, uplo, n, &a(0,0),
-                                 a.nr(), &w(0,0), &work(0,0), work.size());
-
-            return info;
-        }
-
-    // ------------------------------------------------------------------------------------
-
-        template <
-            typename T, 
-            long NR1, long NR2, 
-            long NC1, long NC2,
-            typename MM
-            >
-        int syev (
-            char jobz,
-            char uplo,
-            matrix<T,NR1,NC1,MM,row_major_layout>& a,
-            matrix<T,NR2,NC2,MM,row_major_layout>& w
-        )
-        {
-            matrix<T,0,1,MM,row_major_layout> work;
-
-            if (uplo == 'L')
-                uplo = 'U';
-            else
-                uplo = 'L';
-
-            const long n = a.nr();
-
-            w.set_size(n,1);
-
-
-            // figure out how big the workspace needs to be.
-            T work_size = 1;
-            int info = binding::syev(jobz, uplo, n, &a(0,0),
-                                     a.nc(), &w(0,0), &work_size, -1);
-
-            if (info != 0)
-                return info;
-
-            if (work.size() < work_size)
-                work.set_size(static_cast<long>(work_size), 1);
-
-            // compute the actual decomposition 
-            info = binding::syev(jobz, uplo, n, &a(0,0),
-                                 a.nc(), &w(0,0), &work(0,0), work.size());
-
-
-            a = trans(a);
-
-            return info;
-        }
-
-    // ------------------------------------------------------------------------------------
-
-    }
-
+  return info;
 }
+
+// ------------------------------------------------------------------------------------
+
+template <typename T, long NR1, long NR2, long NC1, long NC2, typename MM>
+int syev(char jobz, char uplo, matrix<T, NR1, NC1, MM, row_major_layout> &a,
+         matrix<T, NR2, NC2, MM, row_major_layout> &w) {
+  matrix<T, 0, 1, MM, row_major_layout> work;
+
+  if (uplo == 'L')
+    uplo = 'U';
+  else
+    uplo = 'L';
+
+  const long n = a.nr();
+
+  w.set_size(n, 1);
+
+  // figure out how big the workspace needs to be.
+  T work_size = 1;
+  int info =
+      binding::syev(jobz, uplo, n, &a(0, 0), a.nc(), &w(0, 0), &work_size, -1);
+
+  if (info != 0)
+    return info;
+
+  if (work.size() < work_size)
+    work.set_size(static_cast<long>(work_size), 1);
+
+  // compute the actual decomposition
+  info = binding::syev(jobz, uplo, n, &a(0, 0), a.nc(), &w(0, 0), &work(0, 0),
+                       work.size());
+
+  a = trans(a);
+
+  return info;
+}
+
+// ------------------------------------------------------------------------------------
+
+} // namespace lapack
+
+} // namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
 #endif // DLIB_LAPACk_EV_Hh_
-
-
-
-

@@ -4,116 +4,85 @@
 #define DLIB_MEMORY_MANAGER_STATELESs_2_
 
 #include "../algs.h"
-#include "memory_manager_stateless_kernel_abstract.h"
 #include "../threads.h"
+#include "memory_manager_stateless_kernel_abstract.h"
 
-namespace dlib
-{
-    template <
-        typename T,
-        typename mem_manager 
-        >
-    class memory_manager_stateless_kernel_2
-    {
-        /*!      
-            REQUIREMENTS ON mem_manager
-                mem_manager must be an implementation of memory_manager/memory_manager_kernel_abstract.h
+namespace dlib {
+template <typename T, typename mem_manager>
+class memory_manager_stateless_kernel_2 {
+  /*!
+      REQUIREMENTS ON mem_manager
+          mem_manager must be an implementation of
+  memory_manager/memory_manager_kernel_abstract.h
 
-            CONVENTION
-                this object has a single global instance of mem_manager 
-        !*/
+      CONVENTION
+          this object has a single global instance of mem_manager
+  !*/
 
-        public:
+public:
+  typedef T type;
+  const static bool is_stateless = true;
 
-            typedef T type;
-            const static bool is_stateless = true;
+  template <typename U> struct rebind {
+    typedef memory_manager_stateless_kernel_2<U, mem_manager> other;
+  };
 
-            template <typename U>
-            struct rebind {
-                typedef memory_manager_stateless_kernel_2<U,mem_manager> other;
-            };
+  memory_manager_stateless_kernel_2() {
+    // call this just to make sure the mutex is is initialized before
+    // multiple threads start calling the member functions.
+    global_mutex();
+  }
 
-            memory_manager_stateless_kernel_2(
-            )
-            { 
-                // call this just to make sure the mutex is is initialized before 
-                // multiple threads start calling the member functions.
-                global_mutex();
-            }
+  virtual ~memory_manager_stateless_kernel_2() {}
 
-            virtual ~memory_manager_stateless_kernel_2(
-            ) {}
+  T *allocate() {
+    auto_mutex M(global_mutex());
+    return global_mm().allocate();
+  }
 
-            T* allocate (
-            )
-            {
-                auto_mutex M(global_mutex());
-                return global_mm().allocate();
-            }
+  void deallocate(T *item) {
+    auto_mutex M(global_mutex());
+    return global_mm().deallocate(item);
+  }
 
-            void deallocate (
-                T* item
-            )
-            {
-                auto_mutex M(global_mutex());
-                return global_mm().deallocate(item);
-            }
+  T *allocate_array(size_t size) {
+    auto_mutex M(global_mutex());
+    return global_mm().allocate_array(size);
+  }
 
-            T* allocate_array (
-                size_t size
-            ) 
-            { 
-                auto_mutex M(global_mutex());
-                return global_mm().allocate_array(size);
-            }
+  void deallocate_array(T *item) {
+    auto_mutex M(global_mutex());
+    return global_mm().deallocate_array(item);
+  }
 
-            void deallocate_array (
-                T* item
-            ) 
-            { 
-                auto_mutex M(global_mutex());
-                return global_mm().deallocate_array(item);
-            }
+  void swap(memory_manager_stateless_kernel_2 &) {}
 
-            void swap (memory_manager_stateless_kernel_2&)
-            {}
+private:
+  static mutex &global_mutex() {
+    static mutex lock;
+    return lock;
+  }
 
-        private:
+  typedef typename mem_manager::template rebind<T>::other rebound_mm_type;
 
-            static mutex& global_mutex (
-            )
-            {
-                static mutex lock;
-                return lock;
-            }
+  static rebound_mm_type &global_mm() {
+    static rebound_mm_type mm;
+    return mm;
+  }
 
-            typedef typename mem_manager::template rebind<T>::other rebound_mm_type; 
+  // restricted functions
+  memory_manager_stateless_kernel_2(
+      memory_manager_stateless_kernel_2 &); // copy constructor
+  memory_manager_stateless_kernel_2 &
+  operator=(memory_manager_stateless_kernel_2 &); // assignment operator
+};
 
-            static rebound_mm_type& global_mm (
-            ) 
-            {
-                static rebound_mm_type mm;
-                return mm;
-            }
-
-            // restricted functions
-            memory_manager_stateless_kernel_2(memory_manager_stateless_kernel_2&);        // copy constructor
-            memory_manager_stateless_kernel_2& operator=(memory_manager_stateless_kernel_2&);    // assignment operator
-    };
-
-    template <
-        typename T,
-        typename mem_manager
-        >
-    inline void swap (
-        memory_manager_stateless_kernel_2<T,mem_manager>& a, 
-        memory_manager_stateless_kernel_2<T,mem_manager>& b 
-    ) { a.swap(b); }   
-
+template <typename T, typename mem_manager>
+inline void swap(memory_manager_stateless_kernel_2<T, mem_manager> &a,
+                 memory_manager_stateless_kernel_2<T, mem_manager> &b) {
+  a.swap(b);
 }
 
+} // namespace dlib
+
 #endif // DLIB_MEMORY_MANAGER_STATELESs_2_
-
-
-
-

@@ -3,65 +3,48 @@
 #ifndef DLIB_SYNC_EXTENSION_KERNEl_1_
 #define DLIB_SYNC_EXTENSION_KERNEl_1_
 
-#include "../threads.h"
 #include "../algs.h"
+#include "../threads.h"
 #include "sync_extension_kernel_abstract.h"
 
-namespace dlib
-{
+namespace dlib {
 
-    template <
-        typename base
-        >
-    class sync_extension_kernel_1 : public base
-    {
+template <typename base> class sync_extension_kernel_1 : public base {
 
-        rmutex m;
-        rsignaler s;
+  rmutex m;
+  rsignaler s;
 
-        public:
+public:
+  sync_extension_kernel_1() : s(m) {}
 
-        sync_extension_kernel_1 () : s(m) {}
+  template <typename T>
+  sync_extension_kernel_1(const T &one) : base(one), s(m) {}
+  template <typename T, typename U>
+  sync_extension_kernel_1(const T &one, const U &two) : base(one, two), s(m) {}
 
-        template < typename T >
-        sync_extension_kernel_1 (const T& one) : base(one),s(m) {}
-        template < typename T, typename U >
-        sync_extension_kernel_1 (const T& one, const U& two) : base(one,two),s(m) {}
+  const rmutex &get_mutex() const { return m; }
 
+  void lock() const { m.lock(); }
 
-        const rmutex& get_mutex(
-        ) const { return m; }
+  void unlock() const { m.unlock(); }
 
-        void lock (
-        ) const { m.lock(); }
+  void wait() const { s.wait(); }
 
-        void unlock (
-        ) const { m.unlock(); }
+  bool wait_or_timeout(unsigned long milliseconds) const {
+    return s.wait_or_timeout(milliseconds);
+  }
 
-        void wait (
-        ) const { s.wait(); }
+  void broadcast() const { s.broadcast(); }
 
-        bool wait_or_timeout (
-            unsigned long milliseconds
-        ) const { return s.wait_or_timeout(milliseconds); }
-         
-        void broadcast (
-        ) const { s.broadcast(); }
+  void signal() const { s.signal(); }
+};
 
-        void signal (
-        ) const { s.signal(); }
-
-    };
-
-    template <
-        typename base
-        >
-    inline void swap (
-        sync_extension_kernel_1<base>& a, 
-        sync_extension_kernel_1<base>& b 
-    ) { a.swap(b); }
-
+template <typename base>
+inline void swap(sync_extension_kernel_1<base> &a,
+                 sync_extension_kernel_1<base> &b) {
+  a.swap(b);
 }
 
-#endif // DLIB_SYNC_EXTENSION_KERNEl_1_
+} // namespace dlib
 
+#endif // DLIB_SYNC_EXTENSION_KERNEl_1_

@@ -4,10 +4,7 @@
 #define DLIB_MANIFOLD_REGULARIzATION_HEADER
 
 #include "graph_utils/edge_list_graphs.h"
-#include "manifold_regularization/linear_manifold_regularizer.h"
 #include "graph_utils/function_objects.h"
+#include "manifold_regularization/linear_manifold_regularizer.h"
 
 #endif // DLIB_MANIFOLD_REGULARIzATION_HEADER
-
-
-

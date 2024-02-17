@@ -17,4 +17,3 @@
 #include "misc_api/misc_api_shared.h"
 
 #endif // DLIB_MISC_APi_
-

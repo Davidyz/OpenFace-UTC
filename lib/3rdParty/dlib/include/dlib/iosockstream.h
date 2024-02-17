@@ -5,7 +5,4 @@
 
 #include "iosockstream/iosockstream.h"
 
-
 #endif // DLIB_IOSOCkSTREAM_H_h_
-
-

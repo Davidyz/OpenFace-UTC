@@ -3,78 +3,70 @@
 #ifndef DLIB_LAPACk_EVR_Hh_
 #define DLIB_LAPACk_EVR_Hh_
 
-#include "fortran_id.h"
 #include "../matrix.h"
+#include "fortran_id.h"
 
-namespace dlib
-{
-    namespace lapack
-    {
-        namespace binding
-        {
-            extern "C"
-            {
-                void DLIB_FORTRAN_ID(dsyevr) (char *jobz, char *range, char *uplo, integer *n, 
-                                              double *a, integer *lda, double *vl, double *vu, integer * il, 
-                                              integer *iu, double *abstol, integer *m, double *w, 
-                                              double *z_, integer *ldz, integer *isuppz, double *work, 
-                                              integer *lwork, integer *iwork, integer *liwork, integer *info);
+namespace dlib {
+namespace lapack {
+namespace binding {
+extern "C" {
+void DLIB_FORTRAN_ID(dsyevr)(char *jobz, char *range, char *uplo, integer *n,
+                             double *a, integer *lda, double *vl, double *vu,
+                             integer *il, integer *iu, double *abstol,
+                             integer *m, double *w, double *z_, integer *ldz,
+                             integer *isuppz, double *work, integer *lwork,
+                             integer *iwork, integer *liwork, integer *info);
 
-                void DLIB_FORTRAN_ID(ssyevr) (char *jobz, char *range, char *uplo, integer *n, 
-                                              float *a, integer *lda, float *vl, float *vu, integer * il, 
-                                              integer *iu, float *abstol, integer *m, float *w, 
-                                              float *z_, integer *ldz, integer *isuppz, float *work, 
-                                              integer *lwork, integer *iwork, integer *liwork, integer *info);
-            }
+void DLIB_FORTRAN_ID(ssyevr)(char *jobz, char *range, char *uplo, integer *n,
+                             float *a, integer *lda, float *vl, float *vu,
+                             integer *il, integer *iu, float *abstol,
+                             integer *m, float *w, float *z_, integer *ldz,
+                             integer *isuppz, float *work, integer *lwork,
+                             integer *iwork, integer *liwork, integer *info);
+}
 
-            inline int syevr (char jobz, char range, char uplo, integer n, 
-                              double* a, integer lda, double vl, double vu, integer il, 
-                              integer iu, double abstol, integer *m, double *w, 
-                              double *z, integer ldz, integer *isuppz, double *work, 
-                              integer lwork, integer *iwork, integer liwork)
-            {
-                integer info = 0;
-                DLIB_FORTRAN_ID(dsyevr)(&jobz, &range, &uplo, &n,
-                                        a, &lda, &vl, &vu, &il,
-                                        &iu, &abstol, m, w,
-                                        z, &ldz, isuppz, work,
-                                        &lwork, iwork, &liwork, &info);
-                return info;
-            }
+inline int syevr(char jobz, char range, char uplo, integer n, double *a,
+                 integer lda, double vl, double vu, integer il, integer iu,
+                 double abstol, integer *m, double *w, double *z, integer ldz,
+                 integer *isuppz, double *work, integer lwork, integer *iwork,
+                 integer liwork) {
+  integer info = 0;
+  DLIB_FORTRAN_ID(dsyevr)
+  (&jobz, &range, &uplo, &n, a, &lda, &vl, &vu, &il, &iu, &abstol, m, w, z,
+   &ldz, isuppz, work, &lwork, iwork, &liwork, &info);
+  return info;
+}
 
-            inline int syevr (char jobz, char range, char uplo, integer n, 
-                              float* a, integer lda, float vl, float vu, integer il, 
-                              integer iu, float abstol, integer *m, float *w, 
-                              float *z, integer ldz, integer *isuppz, float *work, 
-                              integer lwork, integer *iwork, integer liwork)
-            {
-                integer info = 0;
-                DLIB_FORTRAN_ID(ssyevr)(&jobz, &range, &uplo, &n,
-                                        a, &lda, &vl, &vu, &il,
-                                        &iu, &abstol, m, w,
-                                        z, &ldz, isuppz, work,
-                                        &lwork, iwork, &liwork, &info);
-                return info;
-            }
+inline int syevr(char jobz, char range, char uplo, integer n, float *a,
+                 integer lda, float vl, float vu, integer il, integer iu,
+                 float abstol, integer *m, float *w, float *z, integer ldz,
+                 integer *isuppz, float *work, integer lwork, integer *iwork,
+                 integer liwork) {
+  integer info = 0;
+  DLIB_FORTRAN_ID(ssyevr)
+  (&jobz, &range, &uplo, &n, a, &lda, &vl, &vu, &il, &iu, &abstol, m, w, z,
+   &ldz, isuppz, work, &lwork, iwork, &liwork, &info);
+  return info;
+}
 
-        }
+} // namespace binding
 
-    // ------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------
 
-        /*
+/*
 
 *  -- LAPACK driver routine (version 3.1) --
 *     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd..
 *     November 2006
 *
 *     .. Scalar Arguments ..
-      CHARACTER          JOBZ, RANGE, UPLO
-      INTEGER            IL, INFO, IU, LDA, LDZ, LIWORK, LWORK, M, N
-      DOUBLE PRECISION   ABSTOL, VL, VU
+CHARACTER          JOBZ, RANGE, UPLO
+INTEGER            IL, INFO, IU, LDA, LDZ, LIWORK, LWORK, M, N
+DOUBLE PRECISION   ABSTOL, VL, VU
 *     ..
 *     .. Array Arguments ..
-      INTEGER            ISUPPZ( * ), IWORK( * )
-      DOUBLE PRECISION   A( LDA, * ), W( * ), WORK( * ), Z( LDZ, * )
+INTEGER            ISUPPZ( * ), IWORK( * )
+DOUBLE PRECISION   A( LDA, * ), W( * ), WORK( * ), Z( LDZ, * )
 *     ..
 *
 *  Purpose
@@ -287,159 +279,123 @@ namespace dlib
 *
 * =====================================================================
 
-        */
+*/
 
-    // ------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------
 
-        template <
-            typename T, 
-            long NR1, long NR2, long NR3, long NR4,
-            long NC1, long NC2, long NC3, long NC4,
-            typename MM
-            >
-        int syevr (
-            const char jobz,
-            const char range,
-            const char uplo,
-            matrix<T,NR1,NC1,MM,column_major_layout>& a,
-            const double vl,
-            const double vu,
-            const integer il,
-            const integer iu,
-            const double abstol,
-            integer& num_eigenvalues_found,
-            matrix<T,NR2,NC2,MM,column_major_layout>& w,
-            matrix<T,NR3,NC3,MM,column_major_layout>& z,
-            matrix<integer,NR4,NC4,MM,column_major_layout>& isuppz
-        )
-        {
-            matrix<T,0,1,MM,column_major_layout> work;
-            matrix<integer,0,1,MM,column_major_layout> iwork;
+template <typename T, long NR1, long NR2, long NR3, long NR4, long NC1,
+          long NC2, long NC3, long NC4, typename MM>
+int syevr(const char jobz, const char range, const char uplo,
+          matrix<T, NR1, NC1, MM, column_major_layout> &a, const double vl,
+          const double vu, const integer il, const integer iu,
+          const double abstol, integer &num_eigenvalues_found,
+          matrix<T, NR2, NC2, MM, column_major_layout> &w,
+          matrix<T, NR3, NC3, MM, column_major_layout> &z,
+          matrix<integer, NR4, NC4, MM, column_major_layout> &isuppz) {
+  matrix<T, 0, 1, MM, column_major_layout> work;
+  matrix<integer, 0, 1, MM, column_major_layout> iwork;
 
-            const long n = a.nr();
+  const long n = a.nr();
 
-            w.set_size(n,1);
+  w.set_size(n, 1);
 
-            isuppz.set_size(2*n, 1);
+  isuppz.set_size(2 * n, 1);
 
-            if (jobz == 'V')
-            {
-                z.set_size(n,n);
-            }
-            else
-            {
-                z.set_size(NR3?NR3:1, NC3?NC3:1);
-            }
+  if (jobz == 'V') {
+    z.set_size(n, n);
+  } else {
+    z.set_size(NR3 ? NR3 : 1, NC3 ? NC3 : 1);
+  }
 
-            // figure out how big the workspace needs to be.
-            T work_size = 1;
-            integer iwork_size = 1;
-            int info = binding::syevr(jobz, range, uplo, n, &a(0,0),
-                                      a.nr(), vl, vu, il, iu, abstol, &num_eigenvalues_found,
-                                      &w(0,0), &z(0,0), z.nr(), &isuppz(0,0), &work_size, -1,
-                                      &iwork_size, -1);
+  // figure out how big the workspace needs to be.
+  T work_size = 1;
+  integer iwork_size = 1;
+  int info =
+      binding::syevr(jobz, range, uplo, n, &a(0, 0), a.nr(), vl, vu, il, iu,
+                     abstol, &num_eigenvalues_found, &w(0, 0), &z(0, 0), z.nr(),
+                     &isuppz(0, 0), &work_size, -1, &iwork_size, -1);
 
-            if (info != 0)
-                return info;
+  if (info != 0)
+    return info;
 
-            if (work.size() < work_size)
-                work.set_size(static_cast<long>(work_size), 1);
-            if (iwork.size() < iwork_size)
-                iwork.set_size(iwork_size, 1);
+  if (work.size() < work_size)
+    work.set_size(static_cast<long>(work_size), 1);
+  if (iwork.size() < iwork_size)
+    iwork.set_size(iwork_size, 1);
 
-            // compute the actual decomposition 
-            info = binding::syevr(jobz, range, uplo, n, &a(0,0),
-                                  a.nr(), vl, vu, il, iu, abstol, &num_eigenvalues_found,
-                                  &w(0,0), &z(0,0), z.nr(), &isuppz(0,0), &work(0,0), work.size(),
-                                  &iwork(0,0), iwork.size());
+  // compute the actual decomposition
+  info = binding::syevr(jobz, range, uplo, n, &a(0, 0), a.nr(), vl, vu, il, iu,
+                        abstol, &num_eigenvalues_found, &w(0, 0), &z(0, 0),
+                        z.nr(), &isuppz(0, 0), &work(0, 0), work.size(),
+                        &iwork(0, 0), iwork.size());
 
-
-            return info;
-        }
-
-    // ------------------------------------------------------------------------------------
-
-        template <
-            typename T, 
-            long NR1, long NR2, long NR3, long NR4,
-            long NC1, long NC2, long NC3, long NC4,
-            typename MM
-            >
-        int syevr (
-            const char jobz,
-            const char range,
-            char uplo,
-            matrix<T,NR1,NC1,MM,row_major_layout>& a,
-            const double vl,
-            const double vu,
-            const integer il,
-            const integer iu,
-            const double abstol,
-            integer& num_eigenvalues_found,
-            matrix<T,NR2,NC2,MM,row_major_layout>& w,
-            matrix<T,NR3,NC3,MM,row_major_layout>& z,
-            matrix<integer,NR4,NC4,MM,row_major_layout>& isuppz
-        )
-        {
-            matrix<T,0,1,MM,row_major_layout> work;
-            matrix<integer,0,1,MM,row_major_layout> iwork;
-
-            if (uplo == 'L')
-                uplo = 'U';
-            else
-                uplo = 'L';
-
-            const long n = a.nr();
-
-            w.set_size(n,1);
-
-            isuppz.set_size(2*n, 1);
-
-            if (jobz == 'V')
-            {
-                z.set_size(n,n);
-            }
-            else
-            {
-                z.set_size(NR3?NR3:1, NC3?NC3:1);
-            }
-
-            // figure out how big the workspace needs to be.
-            T work_size = 1;
-            integer iwork_size = 1;
-            int info = binding::syevr(jobz, range, uplo, n, &a(0,0),
-                                      a.nc(), vl, vu, il, iu, abstol, &num_eigenvalues_found,
-                                      &w(0,0), &z(0,0), z.nc(), &isuppz(0,0), &work_size, -1,
-                                      &iwork_size, -1);
-
-            if (info != 0)
-                return info;
-
-            if (work.size() < work_size)
-                work.set_size(static_cast<long>(work_size), 1);
-            if (iwork.size() < iwork_size)
-                iwork.set_size(iwork_size, 1);
-
-            // compute the actual decomposition 
-            info = binding::syevr(jobz, range, uplo, n, &a(0,0),
-                                  a.nc(), vl, vu, il, iu, abstol, &num_eigenvalues_found,
-                                  &w(0,0), &z(0,0), z.nc(), &isuppz(0,0), &work(0,0), work.size(),
-                                  &iwork(0,0), iwork.size());
-
-            z = trans(z);
-
-            return info;
-        }
-
-    // ------------------------------------------------------------------------------------
-
-    }
-
+  return info;
 }
+
+// ------------------------------------------------------------------------------------
+
+template <typename T, long NR1, long NR2, long NR3, long NR4, long NC1,
+          long NC2, long NC3, long NC4, typename MM>
+int syevr(const char jobz, const char range, char uplo,
+          matrix<T, NR1, NC1, MM, row_major_layout> &a, const double vl,
+          const double vu, const integer il, const integer iu,
+          const double abstol, integer &num_eigenvalues_found,
+          matrix<T, NR2, NC2, MM, row_major_layout> &w,
+          matrix<T, NR3, NC3, MM, row_major_layout> &z,
+          matrix<integer, NR4, NC4, MM, row_major_layout> &isuppz) {
+  matrix<T, 0, 1, MM, row_major_layout> work;
+  matrix<integer, 0, 1, MM, row_major_layout> iwork;
+
+  if (uplo == 'L')
+    uplo = 'U';
+  else
+    uplo = 'L';
+
+  const long n = a.nr();
+
+  w.set_size(n, 1);
+
+  isuppz.set_size(2 * n, 1);
+
+  if (jobz == 'V') {
+    z.set_size(n, n);
+  } else {
+    z.set_size(NR3 ? NR3 : 1, NC3 ? NC3 : 1);
+  }
+
+  // figure out how big the workspace needs to be.
+  T work_size = 1;
+  integer iwork_size = 1;
+  int info =
+      binding::syevr(jobz, range, uplo, n, &a(0, 0), a.nc(), vl, vu, il, iu,
+                     abstol, &num_eigenvalues_found, &w(0, 0), &z(0, 0), z.nc(),
+                     &isuppz(0, 0), &work_size, -1, &iwork_size, -1);
+
+  if (info != 0)
+    return info;
+
+  if (work.size() < work_size)
+    work.set_size(static_cast<long>(work_size), 1);
+  if (iwork.size() < iwork_size)
+    iwork.set_size(iwork_size, 1);
+
+  // compute the actual decomposition
+  info = binding::syevr(jobz, range, uplo, n, &a(0, 0), a.nc(), vl, vu, il, iu,
+                        abstol, &num_eigenvalues_found, &w(0, 0), &z(0, 0),
+                        z.nc(), &isuppz(0, 0), &work(0, 0), work.size(),
+                        &iwork(0, 0), iwork.size());
+
+  z = trans(z);
+
+  return info;
+}
+
+// ------------------------------------------------------------------------------------
+
+} // namespace lapack
+
+} // namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
 #endif // DLIB_LAPACk_EVR_Hh_
-
-
-

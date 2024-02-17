@@ -7,4 +7,3 @@
 #include "array/array_tools.h"
 
 #endif // DLIB_ARRAy_
-

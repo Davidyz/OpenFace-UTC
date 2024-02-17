@@ -3,8 +3,8 @@
 #ifndef DLIB_DATA_Io_HEADER
 #define DLIB_DATA_Io_HEADER
 
-#include "data_io/libsvm_io.h"
 #include "data_io/image_dataset_metadata.h"
+#include "data_io/libsvm_io.h"
 #include "data_io/mnist.h"
 
 #ifndef DLIB_ISO_CPP_ONLY
@@ -12,7 +12,3 @@
 #endif
 
 #endif // DLIB_DATA_Io_HEADER
-
-
-
-

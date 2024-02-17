@@ -6,6 +6,4 @@
 #include "sockstreambuf/sockstreambuf.h"
 #include "sockstreambuf/sockstreambuf_unbuffered.h"
 
-
 #endif // DLIB_SOCKSTREAMBUf_H_h_
-

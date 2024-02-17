@@ -3,8 +3,7 @@
 #ifndef DLIB_MEMBER_FUNCTION_POINTEr_
 #define DLIB_MEMBER_FUNCTION_POINTEr_
 
-#include "member_function_pointer/member_function_pointer_kernel_1.h"
 #include "member_function_pointer/make_mfp.h"
+#include "member_function_pointer/member_function_pointer_kernel_1.h"
 
-#endif // DLIB_MEMBER_FUNCTION_POINTEr_ 
-
+#endif // DLIB_MEMBER_FUNCTION_POINTEr_

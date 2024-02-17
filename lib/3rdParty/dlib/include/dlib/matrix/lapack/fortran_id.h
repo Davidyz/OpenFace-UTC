@@ -5,7 +5,7 @@
 
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
-//       FORTRAN BINDING STUFF FROM BOOST 
+//       FORTRAN BINDING STUFF FROM BOOST
 // ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------
 
@@ -13,8 +13,7 @@
 //  distribute this software is granted provided this copyright notice appears
 //  in all copies. This software is provided "as is" without express or implied
 //  warranty, and with no claim as to its suitability for any purpose.
-//  Copyright (C) 2002, 2003 Si-Lab b.v.b.a., Toon Knapen and Kresimir Fresl 
-
+//  Copyright (C) 2002, 2003 Si-Lab b.v.b.a., Toon Knapen and Kresimir Fresl
 
 // First we need to know what the conventions for linking
 // C with Fortran is on this platform/toolset
@@ -22,7 +21,8 @@
 #define DLIB_BIND_FORTRAN_LOWERCASE_UNDERSCORE
 #elif defined(LAPACK_FORCE_NOUNDERSCORE)
 #define DLIB_BIND_FORTRAN_LOWERCASE
-#elif defined(__GNUC__) || defined(__ICC) || defined(__sgi) || defined(__COMO__) || defined(__KCC)
+#elif defined(__GNUC__) || defined(__ICC) || defined(__sgi) ||                 \
+    defined(__COMO__) || defined(__KCC)
 #define DLIB_BIND_FORTRAN_LOWERCASE_UNDERSCORE
 #elif defined(__IBMCPP__) || defined(_MSC_VER) || defined(__BORLANDC__)
 #define DLIB_BIND_FORTRAN_LOWERCASE
@@ -30,33 +30,30 @@
 #error do not know how to link with fortran for the given platform
 #endif
 
-// Next we define macros to convert our symbols to 
+// Next we define macros to convert our symbols to
 // the current convention
 #if defined(DLIB_BIND_FORTRAN_LOWERCASE_UNDERSCORE)
-#define DLIB_FORTRAN_ID( id ) id##_
+#define DLIB_FORTRAN_ID(id) id##_
 #elif defined(DLIB_BIND_FORTRAN_LOWERCASE)
-#define DLIB_FORTRAN_ID( id ) id
+#define DLIB_FORTRAN_ID(id) id
 #else
 #error do not know how to bind to fortran calling convention
 #endif
 
-
-
-namespace dlib
-{
-    namespace lapack
-    {
-            // stuff from f2c used to define what exactly is an integer in fortran
-#if (defined(__alpha__) || defined(__sparc64__) || defined(__x86_64__) || defined(__ia64__)) && !defined(MATLAB_MEX_FILE) && !defined(USE_64BIT_LAPACK_INTEGERS)
-            typedef int integer;
-            typedef unsigned int uinteger;
+namespace dlib {
+namespace lapack {
+// stuff from f2c used to define what exactly is an integer in fortran
+#if (defined(__alpha__) || defined(__sparc64__) || defined(__x86_64__) ||      \
+     defined(__ia64__)) &&                                                     \
+    !defined(MATLAB_MEX_FILE) && !defined(USE_64BIT_LAPACK_INTEGERS)
+typedef int integer;
+typedef unsigned int uinteger;
 #else
-            typedef long int integer;
-            typedef unsigned long int uinteger;
+typedef long int integer;
+typedef unsigned long int uinteger;
 #endif
 
-    }
-}
+} // namespace lapack
+} // namespace dlib
 
 #endif // DLIB_BOOST_NUMERIC_BINDINGS_TRAITS_FORTRAN_H
-

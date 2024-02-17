@@ -5,9 +5,7 @@
 
 #include <string>
 
-#include "xml_parser/xml_parser_kernel_interfaces.h"
 #include "xml_parser/xml_parser_kernel_1.h"
-
+#include "xml_parser/xml_parser_kernel_interfaces.h"
 
 #endif // DLIB_XML_PARSEr_
-

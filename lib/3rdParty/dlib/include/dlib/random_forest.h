@@ -6,5 +6,3 @@
 #include "random_forest/random_forest_regression.h"
 
 #endif // DLIB_RANDOM_FOReST_H_
-
-

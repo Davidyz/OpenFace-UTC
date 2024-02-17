@@ -3,46 +3,35 @@
 #ifndef DLIB_LAPACk_GETRF_Hh_
 #define DLIB_LAPACk_GETRF_Hh_
 
-#include "fortran_id.h"
 #include "../matrix.h"
+#include "fortran_id.h"
 
-namespace dlib
-{
-    namespace lapack
-    {
-        namespace binding
-        {
-            extern "C"
-            {
-                void DLIB_FORTRAN_ID(dgetrf) (integer* m, integer *n, double *a, 
-                                             integer* lda, integer *ipiv, integer *info);
+namespace dlib {
+namespace lapack {
+namespace binding {
+extern "C" {
+void DLIB_FORTRAN_ID(dgetrf)(integer *m, integer *n, double *a, integer *lda,
+                             integer *ipiv, integer *info);
 
-                void DLIB_FORTRAN_ID(sgetrf) (integer* m, integer *n, float *a, 
-                                             integer* lda, integer *ipiv, integer *info);
+void DLIB_FORTRAN_ID(sgetrf)(integer *m, integer *n, float *a, integer *lda,
+                             integer *ipiv, integer *info);
+}
 
-            }
+inline int getrf(integer m, integer n, double *a, integer lda, integer *ipiv) {
+  integer info = 0;
+  DLIB_FORTRAN_ID(dgetrf)(&m, &n, a, &lda, ipiv, &info);
+  return info;
+}
 
-            inline int getrf (integer m, integer n, double *a, 
-                              integer lda, integer *ipiv)
-            {
-                integer info = 0;
-                DLIB_FORTRAN_ID(dgetrf)(&m, &n, a, &lda, ipiv, &info);
-                return info;
-            }
+inline int getrf(integer m, integer n, float *a, integer lda, integer *ipiv) {
+  integer info = 0;
+  DLIB_FORTRAN_ID(sgetrf)(&m, &n, a, &lda, ipiv, &info);
+  return info;
+}
 
-            inline int getrf (integer m, integer n, float *a, 
-                              integer lda, integer *ipiv)
-            {
-                integer info = 0;
-                DLIB_FORTRAN_ID(sgetrf)(&m, &n, a, &lda, ipiv, &info);
-                return info;
-            }
+} // namespace binding
 
-
-        }
-
-    // ------------------------------------------------------------------------------------
-
+// ------------------------------------------------------------------------------------
 
 /*  -- LAPACK routine (version 3.1) -- */
 /*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
@@ -96,37 +85,27 @@ namespace dlib
 /*                singular, and division by zero will occur if it is used */
 /*                to solve a system of equations. */
 
+// ------------------------------------------------------------------------------------
 
-    // ------------------------------------------------------------------------------------
+template <typename T, long NR1, long NR2, long NC1, long NC2, typename MM,
+          typename layout>
+int getrf(matrix<T, NR1, NC1, MM, column_major_layout> &a,
+          matrix<integer, NR2, NC2, MM, layout> &ipiv) {
+  const long m = a.nr();
+  const long n = a.nc();
 
-        template <
-            typename T, 
-            long NR1, long NR2,
-            long NC1, long NC2, 
-            typename MM,
-            typename layout
-            >
-        int getrf (
-            matrix<T,NR1,NC1,MM,column_major_layout>& a,
-            matrix<integer,NR2,NC2,MM,layout>& ipiv 
-        )
-        {
-            const long m = a.nr();
-            const long n = a.nc();
+  ipiv.set_size(std::min(m, n), 1);
 
-            ipiv.set_size(std::min(m,n), 1);
-
-            // compute the actual decomposition 
-            return binding::getrf(m, n, &a(0,0), a.nr(), &ipiv(0,0));
-        }
-
-    // ------------------------------------------------------------------------------------
-
-    }
-
+  // compute the actual decomposition
+  return binding::getrf(m, n, &a(0, 0), a.nr(), &ipiv(0, 0));
 }
+
+// ------------------------------------------------------------------------------------
+
+} // namespace lapack
+
+} // namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
 #endif // DLIB_LAPACk_GETRF_Hh_
-

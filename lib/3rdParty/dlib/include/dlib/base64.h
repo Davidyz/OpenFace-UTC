@@ -6,4 +6,3 @@
 #include "base64/base64_kernel_1.h"
 
 #endif // DLIB_BASe64_
-

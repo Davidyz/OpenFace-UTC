@@ -8,227 +8,183 @@
 #include <memory>
 #include <string>
 
-#include "../threads.h"
-#include "../sockets.h"
 #include "../algs.h"
-#include "../set.h"
 #include "../logger.h"
+#include "../set.h"
+#include "../sockets.h"
+#include "../threads.h"
 
+namespace dlib {
 
-namespace dlib
-{
+// These forward declarations are here so we can use them in the typedefs in the
+// server class.  The reason for this is for backwards compatibility with
+// previous versions of dlib.
+class server_http;
+class server_iostream;
 
-    // These forward declarations are here so we can use them in the typedefs in the server
-    // class.  The reason for this is for backwards compatibility with previous versions of
-    // dlib.
-    class server_http;
-    class server_iostream;
+class server {
 
-    class server
-    {
+  /*!
+      INITIAL VALUE
+          listening_port          == 0
+          listening_ip            == ""
+          running                 == false
+          shutting_down           == false
+          cons.size()             == 0
+          listening_port_mutex    == a mutex
+          listening_ip_mutex      == a mutex
+          running_mutex           == a mutex
+          running_signaler        == a signaler associated with running_mutex
+          shutting_down_mutex     == a mutex
+          cons_mutex              == a mutex
+          thread_count            == 0
+          thread_count_mutex      == a mutex
+          thread_count_signaler   == a signaler associated with
+  thread_count_mutex thread_count_zero       == a signaler associated with
+  thread_count_mutex max_connections         == 1000 max_connections_mutex   ==
+  a mutex for max_connections and graceful_close_timeout graceful_close_timeout
+  == 500
 
+      CONVENTION
+          listening_port          == get_listening_port()
+          listening_ip            == get_listening_ip()
+          running                 == is_running()
+          shutting_down           == true while clear() is running.  this
+                                     bool is used to tell the thread blocked on
+                                     accept that it should terminate
+          cons                    == a set containing all open connections
+          listening_port_mutex    == a mutex for listening_port
+          listening_ip_mutex      == a mutex for listening_ip
+          running_mutex           == a mutex for running
+          running_signaler        == a signaler for running and
+                                     is associated with running_mutex.  it is
+                                     used to signal when running is false
+          shutting_down_mutex     == a mutex for shutting_down
+          cons_mutex              == a mutex for cons
+          thread_count            == the number of threads currently running
+          thread_count_mutex      == a mutex for thread_count
+          thread_count_signaler   == a signaler for thread_count and
+                                     is associated with thread_count_mutex.  it
+                                     is used to signal when thread_count is
+                                     decremented
+          thread_count_zero       == a signaler for thread_count and
+                                     is associated with thread_count_mutex.  it
+                                     is used to signal when thread_count becomes
+                                     zero
+          max_connections         == get_max_connections()
+          max_connections_mutex   == a mutex for max_connections
+  !*/
 
-        /*!
-            INITIAL VALUE
-                listening_port          == 0
-                listening_ip            == ""
-                running                 == false
-                shutting_down           == false
-                cons.size()             == 0
-                listening_port_mutex    == a mutex
-                listening_ip_mutex      == a mutex
-                running_mutex           == a mutex
-                running_signaler        == a signaler associated with running_mutex
-                shutting_down_mutex     == a mutex
-                cons_mutex              == a mutex
-                thread_count            == 0
-                thread_count_mutex      == a mutex
-                thread_count_signaler   == a signaler associated with thread_count_mutex
-                thread_count_zero       == a signaler associated with thread_count_mutex
-                max_connections         == 1000 
-                max_connections_mutex   == a mutex for max_connections and graceful_close_timeout
-                graceful_close_timeout  == 500 
-             
-            CONVENTION
-                listening_port          == get_listening_port()
-                listening_ip            == get_listening_ip()
-                running                 == is_running()
-                shutting_down           == true while clear() is running.  this
-                                           bool is used to tell the thread blocked on
-                                           accept that it should terminate
-                cons                    == a set containing all open connections
-                listening_port_mutex    == a mutex for listening_port
-                listening_ip_mutex      == a mutex for listening_ip
-                running_mutex           == a mutex for running
-                running_signaler        == a signaler for running and
-                                           is associated with running_mutex.  it is 
-                                           used to signal when running is false
-                shutting_down_mutex     == a mutex for shutting_down
-                cons_mutex              == a mutex for cons
-                thread_count            == the number of threads currently running
-                thread_count_mutex      == a mutex for thread_count
-                thread_count_signaler   == a signaler for thread_count and
-                                           is associated with thread_count_mutex.  it
-                                           is used to signal when thread_count is
-                                           decremented  
-                thread_count_zero       == a signaler for thread_count and
-                                           is associated with thread_count_mutex.  it
-                                           is used to signal when thread_count becomes
-                                           zero
-                max_connections         == get_max_connections()
-                max_connections_mutex   == a mutex for max_connections
-        !*/
-        
+  typedef set<connection *>::kernel_1a set_of_connections;
 
-        typedef set<connection*>::kernel_1a set_of_connections;
+  // this structure is used to pass parameters to new threads
+  struct param {
+    param(server &server_, connection &new_connection_,
+          unsigned long graceful_close_timeout_)
+        : the_server(server_), new_connection(new_connection_),
+          graceful_close_timeout(graceful_close_timeout_) {}
 
-        // this structure is used to pass parameters to new threads
-        struct param
-        {
-            param (
-                server& server_,
-                connection& new_connection_,
-                unsigned long graceful_close_timeout_
-            ) :
-                the_server(server_),
-                new_connection(new_connection_),
-                graceful_close_timeout(graceful_close_timeout_)
-            {}
+    server &the_server;
+    connection &new_connection;
+    unsigned long graceful_close_timeout;
+  };
 
-            server& the_server;
-            connection& new_connection;
-            unsigned long graceful_close_timeout; 
-        };
-        
+public:
+  // These typedefs are here for backward compatibility with previous versions
+  // of dlib
+  typedef server kernel_1a;
+  typedef server kernel_1a_c;
+  typedef server_iostream iostream_1a;
+  typedef server_iostream iostream_1a_c;
+  typedef server_http http_1a;
+  typedef server_http http_1a_c;
 
+  server();
 
-        public:
+  virtual ~server();
 
-            // These typedefs are here for backward compatibility with previous versions of dlib
-            typedef     server kernel_1a;
-            typedef     server kernel_1a_c;
-            typedef     server_iostream iostream_1a;
-            typedef     server_iostream iostream_1a_c;
-            typedef     server_http http_1a;
-            typedef     server_http http_1a_c;
+  void clear();
 
-            server(
-            );
+  void start();
 
-            virtual ~server(
-            ); 
+  bool is_running() const;
 
-            void clear(
-            );
+  const std::string get_listening_ip() const;
 
-            void start (
-            );
+  int get_listening_port() const;
 
-            bool is_running ( 
-            ) const;
+  void set_listening_port(int port);
 
-            const std::string get_listening_ip (
-            ) const;
+  void set_listening_ip(const std::string &ip);
 
-            int get_listening_port (
-            ) const;
+  void set_max_connections(int max);
 
-            void set_listening_port (
-                int port
-            );
+  int get_max_connections() const;
 
-            void set_listening_ip (
-                const std::string& ip
-            );
+  void start_async();
 
-            void set_max_connections (
-                int max
-            );
+  void set_graceful_close_timeout(unsigned long timeout);
 
-            int get_max_connections (
-            ) const;
+  unsigned long get_graceful_close_timeout() const;
 
-            void start_async (
-            );
+private:
+  void start_async_helper();
 
-            void set_graceful_close_timeout (
-                unsigned long timeout
-            );
+  void start_accepting_connections();
 
-            unsigned long get_graceful_close_timeout (
-            ) const;
+  void open_listening_socket();
 
-        private:
+  virtual void on_connect(connection &new_connection) = 0;
 
-            void start_async_helper (
-            );
+  virtual void on_listening_port_assigned() {}
 
-            void start_accepting_connections (
-            );
+  const static logger sdlog;
 
-            void open_listening_socket (
-            );
+  static void service_connection(void *item);
+  /*!
+      requires
+          item is a pointer to a param struct
+      ensures
+          services the new connection
+          will take care of closing the connection and
+          adding the connection to cons when it first starts and
+          remove the connection from cons and signal that it has
+          done so when it ends
+  !*/
 
-            virtual void on_connect (
-                connection& new_connection
-            )=0;
+  // data members
+  int listening_port;
+  std::string listening_ip;
+  bool running;
+  bool shutting_down;
+  set_of_connections cons;
+  mutex listening_port_mutex;
+  mutex listening_ip_mutex;
+  rmutex running_mutex;
+  rsignaler running_signaler;
+  mutex shutting_down_mutex;
+  mutex cons_mutex;
+  int thread_count;
+  mutex thread_count_mutex;
+  signaler thread_count_signaler;
+  int max_connections;
+  mutex max_connections_mutex;
+  signaler thread_count_zero;
+  std::unique_ptr<thread_function> async_start_thread;
+  std::unique_ptr<listener> sock;
+  unsigned long graceful_close_timeout;
 
-            virtual void on_listening_port_assigned (
-            ) {}
-
-            const static logger sdlog;
-
-            static void service_connection(
-                void* item
-            );
-            /*!
-                requires
-                    item is a pointer to a param struct
-                ensures
-                    services the new connection
-                    will take care of closing the connection and 
-                    adding the connection to cons when it first starts and
-                    remove the connection from cons and signal that it has 
-                    done so when it ends
-            !*/
-
-            // data members
-            int listening_port;
-            std::string listening_ip;
-            bool running;
-            bool shutting_down;
-            set_of_connections cons;
-            mutex listening_port_mutex;
-            mutex listening_ip_mutex;
-            rmutex running_mutex;
-            rsignaler running_signaler;
-            mutex shutting_down_mutex;
-            mutex cons_mutex;
-            int thread_count;
-            mutex thread_count_mutex;
-            signaler thread_count_signaler;
-            int max_connections;
-            mutex max_connections_mutex;
-            signaler thread_count_zero;
-            std::unique_ptr<thread_function> async_start_thread;
-            std::unique_ptr<listener> sock;
-            unsigned long graceful_close_timeout;
-
-
-            // restricted functions
-            server(server&);   
-            server& operator= (
-                server&
-                );    
-    };
+  // restricted functions
+  server(server &);
+  server &operator=(server &);
+};
 
 // ----------------------------------------------------------------------------------------
 
-}
+} // namespace dlib
 
 #ifdef NO_MAKEFILE
 #include "server_kernel.cpp"
 #endif
 
 #endif // DLIB_SERVER_KERNEL_1_
-

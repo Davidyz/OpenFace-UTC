@@ -3,10 +3,7 @@
 #ifndef DLIB_DISJOINt_SUBSETS_
 #define DLIB_DISJOINt_SUBSETS_
 
-
 #include "disjoint_subsets/disjoint_subsets.h"
 #include "disjoint_subsets/disjoint_subsets_sized.h"
 
 #endif // DLIB_DISJOINt_SUBSETS_
-
-

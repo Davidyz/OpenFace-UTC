@@ -5,7 +5,6 @@
 
 #include "platform.h"
 
-
 #ifdef WIN32
 #include "sockets/windows.h"
 #endif
@@ -17,4 +16,3 @@
 #include "sockets/sockets_extensions.h"
 
 #endif // DLIB_SOCKETs_
-

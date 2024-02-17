@@ -9,4 +9,3 @@
 #include "simd/simd8i.h"
 
 #endif // DLIB_SIMd_Hh_
-

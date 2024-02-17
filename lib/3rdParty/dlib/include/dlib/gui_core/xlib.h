@@ -3,4 +3,3 @@
 #ifndef DLIB_GUI_CORE_KERNEl_1_
 #include "gui_core_kernel_2.h"
 #endif
-

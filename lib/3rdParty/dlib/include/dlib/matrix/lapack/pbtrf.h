@@ -3,42 +3,37 @@
 #ifndef DLIB_LAPACk_BDC_Hh_
 #define DLIB_LAPACk_BDC_Hh_
 
-#include "fortran_id.h"
 #include "../matrix.h"
-namespace dlib
-{
-    namespace lapack
-    {
-        namespace binding
-        {
-            extern "C"
-            {
-                void DLIB_FORTRAN_ID(dpbtrf) (const char* uplo, const integer* n, const integer* kd,
-                                              double* ab, const integer* ldab, integer* info);
+#include "fortran_id.h"
+namespace dlib {
+namespace lapack {
+namespace binding {
+extern "C" {
+void DLIB_FORTRAN_ID(dpbtrf)(const char *uplo, const integer *n,
+                             const integer *kd, double *ab, const integer *ldab,
+                             integer *info);
 
-                void DLIB_FORTRAN_ID(spbtrf) (const char* uplo, const integer* n, const integer* kd,
-                                              float* ab, const integer* ldab, integer* info);
+void DLIB_FORTRAN_ID(spbtrf)(const char *uplo, const integer *n,
+                             const integer *kd, float *ab, const integer *ldab,
+                             integer *info);
+}
 
-            }
+inline integer pbtrf(const char uplo, const integer n, const integer kd,
+                     double *ab, const integer ldab) {
+  integer info = 0;
+  DLIB_FORTRAN_ID(dpbtrf)(&uplo, &n, &kd, ab, &ldab, &info);
+  return info;
+}
 
-            inline integer pbtrf (const char uplo, const integer n, const integer kd,
-                                  double* ab, const integer ldab)
-            {
-                integer info = 0;
-                DLIB_FORTRAN_ID(dpbtrf)(&uplo, &n, &kd, ab, &ldab, &info);
-                return info;
-            }
+inline integer pbtrf(const char uplo, const integer n, const integer kd,
+                     float *ab, const integer ldab) {
+  integer info = 0;
+  DLIB_FORTRAN_ID(spbtrf)(&uplo, &n, &kd, ab, &ldab, &info);
+  return info;
+}
+} // namespace binding
 
-            inline integer pbtrf (const char uplo, const integer n, const integer kd,
-                                  float* ab, const integer ldab)
-            {
-                integer info = 0;
-                DLIB_FORTRAN_ID(spbtrf)(&uplo, &n, &kd, ab, &ldab, &info);
-                return info;
-            }
-        }
-
-    // ------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------
 /*  DPBTRF(l)		LAPACK routine (version	1.1)		    DPBTRF(l)
 
 NAME
@@ -67,35 +62,35 @@ PURPOSE
 ARGUMENTS
 
   UPLO	  (input) CHARACTER*1
-	  = 'U':  Upper	triangle of A is stored;
-	  = 'L':  Lower	triangle of A is stored.
+          = 'U':  Upper	triangle of A is stored;
+          = 'L':  Lower	triangle of A is stored.
 
   N	  (input) INTEGER
-	  The order of the matrix A.  N	>= 0.
+          The order of the matrix A.  N	>= 0.
 
   KD	  (input) INTEGER
-	  The number of	superdiagonals of the matrix A if UPLO = 'U', or the
-	  number of subdiagonals if UPLO = 'L'.	 KD >= 0.
+          The number of	superdiagonals of the matrix A if UPLO = 'U', or the
+          number of subdiagonals if UPLO = 'L'.	 KD >= 0.
 
   AB	  (input/output) DOUBLE	PRECISION array, dimension (LDAB,N)
-	  On entry, the	upper or lower triangle	of the symmetric band matrix
-	  A, stored in the first KD+1 rows of the array.  The j-th column of
-	  A is stored in the j-th column of the	array AB as follows: if	UPLO
-	  = 'U', AB(kd+1+i-j,j)	= A(i,j) for max(1,j-kd)<=i<=j;	if UPLO	=
-	  'L', AB(1+i-j,j)    =	A(i,j) for j<=i<=min(n,j+kd).
+          On entry, the	upper or lower triangle	of the symmetric band matrix
+          A, stored in the first KD+1 rows of the array.  The j-th column of
+          A is stored in the j-th column of the	array AB as follows: if	UPLO
+          = 'U', AB(kd+1+i-j,j)	= A(i,j) for max(1,j-kd)<=i<=j;	if UPLO	=
+          'L', AB(1+i-j,j)    =	A(i,j) for j<=i<=min(n,j+kd).
 
-	  On exit, if INFO = 0,	the triangular factor U	or L from the Chole-
-	  sky factorization A =	U**T*U or A = L*L**T of	the band matrix	A, in
-	  the same storage format as A.
+          On exit, if INFO = 0,	the triangular factor U	or L from the Chole-
+          sky factorization A =	U**T*U or A = L*L**T of	the band matrix	A, in
+          the same storage format as A.
 
   LDAB	  (input) INTEGER
-	  The leading dimension	of the array AB.  LDAB >= KD+1.
+          The leading dimension	of the array AB.  LDAB >= KD+1.
 
   INFO	  (output) INTEGER
-	  = 0:	successful exit
-	  < 0:	if INFO	= -i, the i-th argument	had an illegal value
-	  > 0:	if INFO	= i, the leading minor of order	i is not positive
-	  definite, and	the factorization could	not be completed.
+          = 0:	successful exit
+          < 0:	if INFO	= -i, the i-th argument	had an illegal value
+          > 0:	if INFO	= i, the leading minor of order	i is not positive
+          definite, and	the factorization could	not be completed.
 
 FURTHER	DETAILS
   The band storage scheme is illustrated by the	following example, when	N =
@@ -120,59 +115,42 @@ FURTHER	DETAILS
   Contributed by
   Peter	Mayes and Giuseppe Radicati, IBM ECSEC,	Rome, March 23,	1989 */
 
-    // ------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------
 
-        template <
-            typename T, 
-            long NR1, long NC1,
-            typename MM
-            >
-        int pbtrf (
-            char uplo, matrix<T,NR1,NC1,MM,column_major_layout>& ab
-        )
-        {
-            const long ldab = ab.nr();
-            const long n = ab.nc();
-            const long kd = ldab - 1; // assume fully packed 
+template <typename T, long NR1, long NC1, typename MM>
+int pbtrf(char uplo, matrix<T, NR1, NC1, MM, column_major_layout> &ab) {
+  const long ldab = ab.nr();
+  const long n = ab.nc();
+  const long kd = ldab - 1; // assume fully packed
 
-            int info = binding::pbtrf(uplo, n, kd, &ab(0,0), ldab);
+  int info = binding::pbtrf(uplo, n, kd, &ab(0, 0), ldab);
 
-            return info;
-        }
-
-    // ------------------------------------------------------------------------------------
-
-
-        template <
-            typename T, 
-            long NR1, long NC1,
-            typename MM
-            >
-        int pbtrf (
-            char uplo, matrix<T,NR1,NC1,MM,row_major_layout>& ab
-        )
-        {
-            const long ldab = ab.nr();
-            const long n = ab.nc();
-            const long kd = ldab - 1; // assume fully packed 
-
-            matrix<T,NC1,NR1,MM,row_major_layout> abt = trans(ab);
-
-            int info = binding::pbtrf(uplo, n, kd, &abt(0,0), ldab);
-
-            ab = trans(abt);
-
-            return info;
-        }
-
-    // ------------------------------------------------------------------------------------
-
-    }
-
+  return info;
 }
+
+// ------------------------------------------------------------------------------------
+
+template <typename T, long NR1, long NC1, typename MM>
+int pbtrf(char uplo, matrix<T, NR1, NC1, MM, row_major_layout> &ab) {
+  const long ldab = ab.nr();
+  const long n = ab.nc();
+  const long kd = ldab - 1; // assume fully packed
+
+  matrix<T, NC1, NR1, MM, row_major_layout> abt = trans(ab);
+
+  int info = binding::pbtrf(uplo, n, kd, &abt(0, 0), ldab);
+
+  ab = trans(abt);
+
+  return info;
+}
+
+// ------------------------------------------------------------------------------------
+
+} // namespace lapack
+
+} // namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
 #endif // DLIB_LAPACk_BDC_Hh_
-
-

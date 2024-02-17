@@ -14,13 +14,13 @@
     still exist but they don't do anything.
 
     Also note that when the stack trace is enabled it changes the DLIB_ASSERT
-    and DLIB_CASSERT macros so that they print stack traces when 
+    and DLIB_CASSERT macros so that they print stack traces when
     an assert fails.
 
     See the following example program for details:
 
-    #include <iostream>
     #include <dlib/stack_trace.h>
+    #include <iostream>
 
     void funct2()
     {
@@ -28,7 +28,7 @@
         // like to appear in stack traces
         DLIB_STACK_TRACE;
 
-        // you may print the current stack trace as follows. 
+        // you may print the current stack trace as follows.
         std::cout << dlib::get_stack_trace() << endl;
     }
 
@@ -48,71 +48,66 @@
     }
 !*/
 
-
-#include <string>
 #include "assert.h"
+#include <string>
 
-// only setup the stack trace stuff if the asserts are enabled (which happens in debug mode
-// basically).  Also, this stuff doesn't work if you use NO_MAKEFILE
-#if defined(DLIB_ENABLE_STACK_TRACE) 
-#ifdef NO_MAKEFILE 
-#error "You can't use the dlib stack trace stuff and NO_MAKEFILE at the same time"
+// only setup the stack trace stuff if the asserts are enabled (which happens in
+// debug mode basically).  Also, this stuff doesn't work if you use NO_MAKEFILE
+#if defined(DLIB_ENABLE_STACK_TRACE)
+#ifdef NO_MAKEFILE
+#error                                                                         \
+    "You can't use the dlib stack trace stuff and NO_MAKEFILE at the same time"
 #endif
 
-namespace dlib
-{
-    const std::string get_stack_trace();
+namespace dlib {
+const std::string get_stack_trace();
 }
 
 // redefine the DLIB_CASSERT macro to include the stack trace
 #undef DLIBM_CASSERT
-#define DLIBM_CASSERT(_exp,_message)                                              \
-    {if ( !(_exp) )                                                         \
-    {                                                                       \
-        std::ostringstream dlib_o_out;                                       \
-        dlib_o_out << "\n\nError occurred at line " << __LINE__ << ".\n";    \
-        dlib_o_out << "Error occurred in file " << __FILE__ << ".\n";      \
-        dlib_o_out << "Error occurred in function " << DLIB_FUNCTION_NAME << ".\n\n";      \
-        dlib_o_out << "Failing expression was " << #_exp << ".\n";           \
-        dlib_o_out << _message << "\n\n";                                      \
-        dlib_o_out << "Stack Trace: \n" << dlib::get_stack_trace() << "\n";        \
-        dlib_assert_breakpoint();                                           \
-        throw dlib::fatal_error(dlib::EBROKEN_ASSERT,dlib_o_out.str());      \
-    }}                                                                      
+#define DLIBM_CASSERT(_exp, _message)                                          \
+  {                                                                            \
+    if (!(_exp)) {                                                             \
+      std::ostringstream dlib_o_out;                                           \
+      dlib_o_out << "\n\nError occurred at line " << __LINE__ << ".\n";        \
+      dlib_o_out << "Error occurred in file " << __FILE__ << ".\n";            \
+      dlib_o_out << "Error occurred in function " << DLIB_FUNCTION_NAME        \
+                 << ".\n\n";                                                   \
+      dlib_o_out << "Failing expression was " << #_exp << ".\n";               \
+      dlib_o_out << _message << "\n\n";                                        \
+      dlib_o_out << "Stack Trace: \n" << dlib::get_stack_trace() << "\n";      \
+      dlib_assert_breakpoint();                                                \
+      throw dlib::fatal_error(dlib::EBROKEN_ASSERT, dlib_o_out.str());         \
+    }                                                                          \
+  }
 
+namespace dlib {
 
+class stack_tracer {
+public:
+  stack_tracer(const char *funct_name, const char *file_name,
+               const int line_number);
 
-namespace dlib
-{
+  ~stack_tracer();
+};
+} // namespace dlib
 
-    class stack_tracer
-    {
-    public:
-        stack_tracer (
-            const char* funct_name,
-            const char* file_name,
-            const int line_number
-        );
-
-        ~stack_tracer();
-
-    };
-}
-
-#define DLIB_STACK_TRACE_NAMED(x) dlib::stack_tracer dlib_stack_tracer_object(x,__FILE__,__LINE__)
-#define DLIB_STACK_TRACE dlib::stack_tracer dlib_stack_tracer_object(DLIB_FUNCTION_NAME,__FILE__,__LINE__)
+#define DLIB_STACK_TRACE_NAMED(x)                                              \
+  dlib::stack_tracer dlib_stack_tracer_object(x, __FILE__, __LINE__)
+#define DLIB_STACK_TRACE                                                       \
+  dlib::stack_tracer dlib_stack_tracer_object(DLIB_FUNCTION_NAME, __FILE__,    \
+                                              __LINE__)
 
 #else // don't do anything if ENABLE_ASSERTS isn't defined
-#define DLIB_STACK_TRACE_NAMED(x) 
-#define DLIB_STACK_TRACE 
+#define DLIB_STACK_TRACE_NAMED(x)
+#define DLIB_STACK_TRACE
 
-namespace dlib
-{
-    inline const std::string get_stack_trace() { return std::string("stack trace not enabled");}
+namespace dlib {
+inline const std::string get_stack_trace() {
+  return std::string("stack trace not enabled");
 }
+} // namespace dlib
 
 #endif
 
-
 #endif // DLIB_STACK_TRACe_
-

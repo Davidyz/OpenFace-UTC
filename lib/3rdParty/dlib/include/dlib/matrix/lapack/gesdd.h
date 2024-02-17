@@ -3,55 +3,50 @@
 #ifndef DLIB_LAPACk_SDD_Hh_
 #define DLIB_LAPACk_SDD_Hh_
 
-#include "fortran_id.h"
 #include "../matrix.h"
+#include "fortran_id.h"
 
-namespace dlib
-{
-    namespace lapack
-    {
-        namespace binding
-        {
-            extern "C"
-            {
-                void DLIB_FORTRAN_ID(dgesdd) (char const* jobz, 
-                                              const integer* m, const integer* n, double* a, const integer* lda,
-                                              double* s, double* u, const integer* ldu,
-                                              double* vt, const integer* ldvt,
-                                              double* work, const integer* lwork, integer* iwork, integer* info);
+namespace dlib {
+namespace lapack {
+namespace binding {
+extern "C" {
+void DLIB_FORTRAN_ID(dgesdd)(char const *jobz, const integer *m,
+                             const integer *n, double *a, const integer *lda,
+                             double *s, double *u, const integer *ldu,
+                             double *vt, const integer *ldvt, double *work,
+                             const integer *lwork, integer *iwork,
+                             integer *info);
 
-                void DLIB_FORTRAN_ID(sgesdd) (char const* jobz, 
-                                              const integer* m, const integer* n, float* a, const integer* lda,
-                                              float* s, float* u, const integer* ldu,
-                                              float* vt, const integer* ldvt,
-                                              float* work, const integer* lwork, integer* iwork, integer* info);
+void DLIB_FORTRAN_ID(sgesdd)(char const *jobz, const integer *m,
+                             const integer *n, float *a, const integer *lda,
+                             float *s, float *u, const integer *ldu, float *vt,
+                             const integer *ldvt, float *work,
+                             const integer *lwork, integer *iwork,
+                             integer *info);
+}
 
-            }
+inline integer gesdd(const char jobz, const integer m, const integer n,
+                     double *a, const integer lda, double *s, double *u,
+                     const integer ldu, double *vt, const integer ldvt,
+                     double *work, const integer lwork, integer *iwork) {
+  integer info = 0;
+  DLIB_FORTRAN_ID(dgesdd)
+  (&jobz, &m, &n, a, &lda, s, u, &ldu, vt, &ldvt, work, &lwork, iwork, &info);
+  return info;
+}
 
-            inline integer gesdd (const char jobz, 
-                              const integer m, const integer n, double* a, const integer lda,
-                              double* s, double* u, const integer ldu,
-                              double* vt, const integer ldvt,
-                              double* work, const integer lwork, integer* iwork)
-            {
-                integer info = 0;
-                DLIB_FORTRAN_ID(dgesdd)(&jobz, &m, &n, a, &lda, s, u, &ldu, vt, &ldvt, work, &lwork, iwork, &info);
-                return info;
-            }
+inline integer gesdd(const char jobz, const integer m, const integer n,
+                     float *a, const integer lda, float *s, float *u,
+                     const integer ldu, float *vt, const integer ldvt,
+                     float *work, const integer lwork, integer *iwork) {
+  integer info = 0;
+  DLIB_FORTRAN_ID(sgesdd)
+  (&jobz, &m, &n, a, &lda, s, u, &ldu, vt, &ldvt, work, &lwork, iwork, &info);
+  return info;
+}
+} // namespace binding
 
-            inline integer gesdd (const char jobz, 
-                              const integer m, const integer n, float* a, const integer lda,
-                              float* s, float* u, const integer ldu,
-                              float* vt, const integer ldvt,
-                              float* work, const integer lwork, integer* iwork)
-            {
-                integer info = 0;
-                DLIB_FORTRAN_ID(sgesdd)(&jobz, &m, &n, a, &lda, s, u, &ldu, vt, &ldvt, work, &lwork, iwork, &info);
-                return info;
-            }
-        }
-
-    // ------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------
 
 /*  -- LAPACK driver routine (version 3.1) -- */
 /*     Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd.. */
@@ -156,7 +151,8 @@ namespace dlib
 /*          JOBZ = 'A' or JOBZ = 'O' and M >= N, LDVT >= N; */
 /*          if JOBZ = 'S', LDVT >= min(M,N). */
 
-/*  WORK    (workspace/output) DOUBLE PRECISION array, dimension (MAX(1,LWORK)) */
+/*  WORK    (workspace/output) DOUBLE PRECISION array, dimension (MAX(1,LWORK))
+ */
 /*          On exit, if INFO = 0, WORK(1) returns the optimal LWORK; */
 
 /*  LWORK   (input) INTEGER */
@@ -187,178 +183,142 @@ namespace dlib
 /*     Ming Gu and Huan Ren, Computer Science Division, University of */
 /*     California at Berkeley, USA */
 
-    // ------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------
 
-        template <
-            typename T, 
-            long NR1, long NR2, long NR3, long NR4,
-            long NC1, long NC2, long NC3, long NC4,
-            typename MM
-            >
-        int gesdd (
-            const char jobz,
-            matrix<T,NR1,NC1,MM,column_major_layout>& a,
-            matrix<T,NR2,NC2,MM,column_major_layout>& s,
-            matrix<T,NR3,NC3,MM,column_major_layout>& u,
-            matrix<T,NR4,NC4,MM,column_major_layout>& vt
-        )
-        {
-            matrix<T,0,1,MM,column_major_layout> work;
-            matrix<integer,0,1,MM,column_major_layout> iwork;
+template <typename T, long NR1, long NR2, long NR3, long NR4, long NC1,
+          long NC2, long NC3, long NC4, typename MM>
+int gesdd(const char jobz, matrix<T, NR1, NC1, MM, column_major_layout> &a,
+          matrix<T, NR2, NC2, MM, column_major_layout> &s,
+          matrix<T, NR3, NC3, MM, column_major_layout> &u,
+          matrix<T, NR4, NC4, MM, column_major_layout> &vt) {
+  matrix<T, 0, 1, MM, column_major_layout> work;
+  matrix<integer, 0, 1, MM, column_major_layout> iwork;
 
-            const long m = a.nr();
-            const long n = a.nc();
-            s.set_size(std::min(m,n), 1);
+  const long m = a.nr();
+  const long n = a.nc();
+  s.set_size(std::min(m, n), 1);
 
-            // make sure the iwork memory block is big enough
-            if (iwork.size() < 8*std::min(m,n))
-                iwork.set_size(8*std::min(m,n), 1);
+  // make sure the iwork memory block is big enough
+  if (iwork.size() < 8 * std::min(m, n))
+    iwork.set_size(8 * std::min(m, n), 1);
 
-            if (jobz == 'A')
-            {
-                u.set_size(m,m);
-                vt.set_size(n,n);
-            }
-            else if (jobz == 'S')
-            {
-                u.set_size(m, std::min(m,n));
-                vt.set_size(std::min(m,n), n);
-            }
-            else if (jobz == 'O')
-            {
-                DLIB_CASSERT(false, "jobz == 'O' not supported");
-            }
-            else
-            {
-                u.set_size(NR3?NR3:1, NC3?NC3:1);
-                vt.set_size(NR4?NR4:1, NC4?NC4:1);
-            }
+  if (jobz == 'A') {
+    u.set_size(m, m);
+    vt.set_size(n, n);
+  } else if (jobz == 'S') {
+    u.set_size(m, std::min(m, n));
+    vt.set_size(std::min(m, n), n);
+  } else if (jobz == 'O') {
+    DLIB_CASSERT(false, "jobz == 'O' not supported");
+  } else {
+    u.set_size(NR3 ? NR3 : 1, NC3 ? NC3 : 1);
+    vt.set_size(NR4 ? NR4 : 1, NC4 ? NC4 : 1);
+  }
 
-            // figure out how big the workspace needs to be.
-            T work_size = 1;
-            int info = binding::gesdd(jobz, a.nr(), a.nc(), &a(0,0), a.nr(),
-                                      &s(0,0), &u(0,0), u.nr(), &vt(0,0), vt.nr(),
-                                      &work_size, -1, &iwork(0,0));
+  // figure out how big the workspace needs to be.
+  T work_size = 1;
+  int info =
+      binding::gesdd(jobz, a.nr(), a.nc(), &a(0, 0), a.nr(), &s(0, 0), &u(0, 0),
+                     u.nr(), &vt(0, 0), vt.nr(), &work_size, -1, &iwork(0, 0));
 
-            if (info != 0)
-                return info;
+  if (info != 0)
+    return info;
 
-            // There is a bug in an older version of LAPACK in Debian etch 
-            // that causes the gesdd to return the wrong value for work_size
-            // when jobz == 'N'.  So verify the value of work_size.
-            if (jobz == 'N')
-            {
-                using std::min; 
-                using std::max; 
-                const T min_work_size = 3*min(m,n) + max(max(m,n),7*min(m,n));
-                if (work_size < min_work_size)
-                    work_size = min_work_size;
-            }
+  // There is a bug in an older version of LAPACK in Debian etch
+  // that causes the gesdd to return the wrong value for work_size
+  // when jobz == 'N'.  So verify the value of work_size.
+  if (jobz == 'N') {
+    using std::max;
+    using std::min;
+    const T min_work_size = 3 * min(m, n) + max(max(m, n), 7 * min(m, n));
+    if (work_size < min_work_size)
+      work_size = min_work_size;
+  }
 
-            if (work.size() < work_size)
-                work.set_size(static_cast<long>(work_size), 1);
+  if (work.size() < work_size)
+    work.set_size(static_cast<long>(work_size), 1);
 
-            // compute the actual SVD
-            info = binding::gesdd(jobz, a.nr(), a.nc(), &a(0,0), a.nr(),
-                                  &s(0,0), &u(0,0), u.nr(), &vt(0,0), vt.nr(),
-                                  &work(0,0), work.size(), &iwork(0,0));
+  // compute the actual SVD
+  info = binding::gesdd(jobz, a.nr(), a.nc(), &a(0, 0), a.nr(), &s(0, 0),
+                        &u(0, 0), u.nr(), &vt(0, 0), vt.nr(), &work(0, 0),
+                        work.size(), &iwork(0, 0));
 
-            return info;
-        }
-
-    // ------------------------------------------------------------------------------------
-
-        template <
-            typename T, 
-            long NR1, long NR2, long NR3, long NR4,
-            long NC1, long NC2, long NC3, long NC4,
-            typename MM
-            >
-        int gesdd (
-            const char jobz,
-            matrix<T,NR1,NC1,MM,row_major_layout>& a,
-            matrix<T,NR2,NC2,MM,row_major_layout>& s,
-            matrix<T,NR3,NC3,MM,row_major_layout>& u_,
-            matrix<T,NR4,NC4,MM,row_major_layout>& vt_
-        )
-        {
-            matrix<T,0,1,MM,row_major_layout> work;
-            matrix<integer,0,1,MM,row_major_layout> iwork;
-
-            // Row major order matrices are transposed from LAPACK's point of view.
-            matrix<T,NR4,NC4,MM,row_major_layout>& u = vt_;
-            matrix<T,NR3,NC3,MM,row_major_layout>& vt = u_;
-
-
-            const long m = a.nc();
-            const long n = a.nr();
-            s.set_size(std::min(m,n), 1);
-
-            // make sure the iwork memory block is big enough
-            if (iwork.size() < 8*std::min(m,n))
-                iwork.set_size(8*std::min(m,n), 1);
-
-            if (jobz == 'A')
-            {
-                u.set_size(m,m);
-                vt.set_size(n,n);
-            }
-            else if (jobz == 'S')
-            {
-                u.set_size(std::min(m,n), m);
-                vt.set_size(n, std::min(m,n));
-            }
-            else if (jobz == 'O')
-            {
-                DLIB_CASSERT(false, "jobz == 'O' not supported");
-            }
-            else
-            {
-                u.set_size(NR4?NR4:1, NC4?NC4:1);
-                vt.set_size(NR3?NR3:1, NC3?NC3:1);
-            }
-
-            // figure out how big the workspace needs to be.
-            T work_size = 1;
-            int info = binding::gesdd(jobz, m, n, &a(0,0), a.nc(),
-                                      &s(0,0), &u(0,0), u.nc(), &vt(0,0), vt.nc(),
-                                      &work_size, -1, &iwork(0,0));
-
-            if (info != 0)
-                return info;
-
-            // There is a bug in an older version of LAPACK in Debian etch 
-            // that causes the gesdd to return the wrong value for work_size
-            // when jobz == 'N'.  So verify the value of work_size.
-            if (jobz == 'N')
-            {
-                using std::min; 
-                using std::max; 
-                const T min_work_size = 3*min(m,n) + max(max(m,n),7*min(m,n));
-                if (work_size < min_work_size)
-                    work_size = min_work_size;
-            }
-
-
-            if (work.size() < work_size)
-                work.set_size(static_cast<long>(work_size), 1);
-
-            // compute the actual SVD
-            info = binding::gesdd(jobz, m, n, &a(0,0), a.nc(),
-                                  &s(0,0), &u(0,0), u.nc(), &vt(0,0), vt.nc(),
-                                  &work(0,0), work.size(), &iwork(0,0));
-
-            return info;
-        }
-
-    // ------------------------------------------------------------------------------------
-
-    }
-
+  return info;
 }
+
+// ------------------------------------------------------------------------------------
+
+template <typename T, long NR1, long NR2, long NR3, long NR4, long NC1,
+          long NC2, long NC3, long NC4, typename MM>
+int gesdd(const char jobz, matrix<T, NR1, NC1, MM, row_major_layout> &a,
+          matrix<T, NR2, NC2, MM, row_major_layout> &s,
+          matrix<T, NR3, NC3, MM, row_major_layout> &u_,
+          matrix<T, NR4, NC4, MM, row_major_layout> &vt_) {
+  matrix<T, 0, 1, MM, row_major_layout> work;
+  matrix<integer, 0, 1, MM, row_major_layout> iwork;
+
+  // Row major order matrices are transposed from LAPACK's point of view.
+  matrix<T, NR4, NC4, MM, row_major_layout> &u = vt_;
+  matrix<T, NR3, NC3, MM, row_major_layout> &vt = u_;
+
+  const long m = a.nc();
+  const long n = a.nr();
+  s.set_size(std::min(m, n), 1);
+
+  // make sure the iwork memory block is big enough
+  if (iwork.size() < 8 * std::min(m, n))
+    iwork.set_size(8 * std::min(m, n), 1);
+
+  if (jobz == 'A') {
+    u.set_size(m, m);
+    vt.set_size(n, n);
+  } else if (jobz == 'S') {
+    u.set_size(std::min(m, n), m);
+    vt.set_size(n, std::min(m, n));
+  } else if (jobz == 'O') {
+    DLIB_CASSERT(false, "jobz == 'O' not supported");
+  } else {
+    u.set_size(NR4 ? NR4 : 1, NC4 ? NC4 : 1);
+    vt.set_size(NR3 ? NR3 : 1, NC3 ? NC3 : 1);
+  }
+
+  // figure out how big the workspace needs to be.
+  T work_size = 1;
+  int info =
+      binding::gesdd(jobz, m, n, &a(0, 0), a.nc(), &s(0, 0), &u(0, 0), u.nc(),
+                     &vt(0, 0), vt.nc(), &work_size, -1, &iwork(0, 0));
+
+  if (info != 0)
+    return info;
+
+  // There is a bug in an older version of LAPACK in Debian etch
+  // that causes the gesdd to return the wrong value for work_size
+  // when jobz == 'N'.  So verify the value of work_size.
+  if (jobz == 'N') {
+    using std::max;
+    using std::min;
+    const T min_work_size = 3 * min(m, n) + max(max(m, n), 7 * min(m, n));
+    if (work_size < min_work_size)
+      work_size = min_work_size;
+  }
+
+  if (work.size() < work_size)
+    work.set_size(static_cast<long>(work_size), 1);
+
+  // compute the actual SVD
+  info = binding::gesdd(jobz, m, n, &a(0, 0), a.nc(), &s(0, 0), &u(0, 0),
+                        u.nc(), &vt(0, 0), vt.nc(), &work(0, 0), work.size(),
+                        &iwork(0, 0));
+
+  return info;
+}
+
+// ------------------------------------------------------------------------------------
+
+} // namespace lapack
+
+} // namespace dlib
 
 // ----------------------------------------------------------------------------------------
 
 #endif // DLIB_LAPACk_SDD_Hh_
-
-

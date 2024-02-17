@@ -3,4 +3,3 @@
 #ifndef DLIB_DIR_NAV_KERNEl_1_
 #include "dir_nav_kernel_2.h"
 #endif
-

@@ -7,5 +7,3 @@
 #include "control/mpc.h"
 
 #endif // DLIB_CONTRoL_
-
-

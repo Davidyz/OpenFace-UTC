@@ -14,5 +14,3 @@
 #endif
 
 #endif // DLIB_THREADs_KERNEL_
-
-

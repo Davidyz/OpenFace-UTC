@@ -3,9 +3,7 @@
 #ifndef DLIB_DIR_NAv_
 #define DLIB_DIR_NAv_
 
-
 #include "platform.h"
-
 
 #ifdef WIN32
 #include "dir_nav/windows.h"
@@ -18,4 +16,3 @@
 #include "dir_nav/dir_nav_extensions.h"
 
 #endif // DLIB_DIR_NAv_
-

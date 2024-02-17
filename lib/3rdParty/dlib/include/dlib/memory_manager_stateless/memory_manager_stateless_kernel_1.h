@@ -6,96 +6,54 @@
 #include "memory_manager_stateless_kernel_abstract.h"
 #include <memory>
 
-namespace dlib
-{
-    template <
-        typename T
-        >
-    class memory_manager_stateless_kernel_1
-    {
-        /*!      
-            this implementation just calls new and delete directly
-        !*/
-        
-        public:
+namespace dlib {
+template <typename T> class memory_manager_stateless_kernel_1 {
+  /*!
+      this implementation just calls new and delete directly
+  !*/
 
-            typedef T type;
-            const static bool is_stateless = true;
+public:
+  typedef T type;
+  const static bool is_stateless = true;
 
-            template <typename U>
-            struct rebind {
-                typedef memory_manager_stateless_kernel_1<U> other;
-            };
+  template <typename U> struct rebind {
+    typedef memory_manager_stateless_kernel_1<U> other;
+  };
 
-            memory_manager_stateless_kernel_1(
-            )
-            {}
+  memory_manager_stateless_kernel_1() {}
 
-            virtual ~memory_manager_stateless_kernel_1(
-            ) {}
+  virtual ~memory_manager_stateless_kernel_1() {}
 
-            T* allocate (
-            )
-            {
-                return new T; 
-            }
+  T *allocate() { return new T; }
 
-            void deallocate (
-                T* item
-            )
-            {
-                delete item;
-            }
+  void deallocate(T *item) { delete item; }
 
-            T* allocate_array (
-                size_t size
-            ) 
-            { 
-                return new T[size];
-            }
+  T *allocate_array(size_t size) { return new T[size]; }
 
-            void deallocate_array (
-                T* item
-            ) 
-            { 
-                delete [] item;
-            }
+  void deallocate_array(T *item) { delete[] item; }
 
-            void swap (memory_manager_stateless_kernel_1&)
-            {}
+  void swap(memory_manager_stateless_kernel_1 &) {}
 
-            std::unique_ptr<T> extract(
-                T* item
-            )
-            {
-                return std::unique_ptr<T>(item);
-            }
+  std::unique_ptr<T> extract(T *item) { return std::unique_ptr<T>(item); }
 
-            std::unique_ptr<T[]> extract_array(
-                T* item
-            )
-            {
-                return std::unique_ptr<T[]>(item);
-            }
+  std::unique_ptr<T[]> extract_array(T *item) {
+    return std::unique_ptr<T[]>(item);
+  }
 
-        private:
+private:
+  // restricted functions
+  memory_manager_stateless_kernel_1(
+      memory_manager_stateless_kernel_1 &); // copy constructor
+  memory_manager_stateless_kernel_1 &
+  operator=(memory_manager_stateless_kernel_1 &); // assignment operator
+};
 
-            // restricted functions
-            memory_manager_stateless_kernel_1(memory_manager_stateless_kernel_1&);        // copy constructor
-            memory_manager_stateless_kernel_1& operator=(memory_manager_stateless_kernel_1&);    // assignment operator
-    };
-
-    template <
-        typename T
-        >
-    inline void swap (
-        memory_manager_stateless_kernel_1<T>& a, 
-        memory_manager_stateless_kernel_1<T>& b 
-    ) { a.swap(b); }   
-
+template <typename T>
+inline void swap(memory_manager_stateless_kernel_1<T> &a,
+                 memory_manager_stateless_kernel_1<T> &b) {
+  a.swap(b);
 }
 
+} // namespace dlib
+
 #endif // DLIB_MEMORY_MANAGER_STATELESs_1_
-
-
-

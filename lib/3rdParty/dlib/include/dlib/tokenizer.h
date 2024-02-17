@@ -6,28 +6,18 @@
 #include "tokenizer/tokenizer_kernel_1.h"
 #include "tokenizer/tokenizer_kernel_c.h"
 
+namespace dlib {
 
-namespace dlib
-{
+class tokenizer {
+  tokenizer() {}
 
-    class tokenizer
-    {
-        tokenizer() {}
+public:
+  //----------- kernels ---------------
 
-
-    public:
-        
-        //----------- kernels ---------------
-
-        // kernel_1a        
-        typedef     tokenizer_kernel_1
-                    kernel_1a;
-        typedef     tokenizer_kernel_c<kernel_1a>
-                    kernel_1a_c;
-          
-
-    };
-}
+  // kernel_1a
+  typedef tokenizer_kernel_1 kernel_1a;
+  typedef tokenizer_kernel_c<kernel_1a> kernel_1a_c;
+};
+} // namespace dlib
 
 #endif // DLIB_TOKENIZEr_
-

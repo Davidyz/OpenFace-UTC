@@ -8,36 +8,19 @@
 
 #include <functional>
 
+namespace dlib {
 
-namespace dlib
-{
+template <typename domain, typename range, typename compare = std::less<domain>>
+class static_map {
+  static_map() {}
 
-    template <
-        typename domain,
-        typename range,
-        typename compare = std::less<domain>
-        >
-    class static_map
-    {
-        static_map() {}
+public:
+  //----------- kernels ---------------
 
-
-    public:
-        
-        //----------- kernels ---------------
-
-        // kernel_1a        
-        typedef     static_map_kernel_1<domain,range,compare>
-                    kernel_1a;
-        typedef     static_map_kernel_c<kernel_1a>
-                    kernel_1a_c;
-        
-   
-
-
-
-    };
-}
+  // kernel_1a
+  typedef static_map_kernel_1<domain, range, compare> kernel_1a;
+  typedef static_map_kernel_c<kernel_1a> kernel_1a_c;
+};
+} // namespace dlib
 
 #endif // DLIB_STATIC_MAp_
-
